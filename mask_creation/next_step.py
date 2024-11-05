@@ -21,6 +21,8 @@ counts, bin_edges = np.histogram(data.ravel(), bins=num_bins)
 # Calculate bin centers as the midpoint between each bin edge
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
+#create mask
+data_copy = np.copy(data)
 
 
 
