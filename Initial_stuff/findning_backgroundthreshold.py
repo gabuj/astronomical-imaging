@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
 
-path="Astro/Astro/Fits_Data/mosaic.fits"
+path='/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Astro/Fits_Data/mosaic.fits'
 #parameters to calcualte background:
 num_bins = 10000
 
