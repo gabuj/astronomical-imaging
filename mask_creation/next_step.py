@@ -17,7 +17,12 @@ data = hdulist[0].data
 #create mask
 binary_mask= data > threshold
 
-print(binary_mask)
+# Use label to identify connected regions in the binary mask
+labeled_image, num_galaxies = label(binary_mask)
+
+print(f"Number of detected objects (galaxies): {num_galaxies}")
+
+print(labeled_image)
 
 #close fits file
 hdulist.close()
