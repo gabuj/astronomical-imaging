@@ -4,60 +4,60 @@
 <VOTABLE version="1.4" xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://www.ivoa.net/xml/VOTable/VOTable-1.4.xsd">
  <RESOURCE type="results">
   <TABLE>
-   <FIELD ID="x" datatype="double" name="x"/>
-   <FIELD ID="y" datatype="double" name="y"/>
+   <FIELD ID="x" datatype="long" name="x"/>
+   <FIELD ID="y" datatype="long" name="y"/>
    <FIELD ID="intensity" datatype="double" name="intensity"/>
    <DATA>
     <TABLEDATA>
      <TR>
-      <TD>190.71300448430495</TD>
-      <TD>349.90582959641256</TD>
-      <TD>3828.1304347826085</TD>
+      <TD>997</TD>
+      <TD>2</TD>
+      <TD>57106</TD>
      </TR>
      <TR>
-      <TD>255.390625</TD>
-      <TD>250.96875</TD>
-      <TD>3614.159420289855</TD>
+      <TD>982</TD>
+      <TD>2</TD>
+      <TD>49263</TD>
      </TR>
      <TR>
-      <TD>108.41573033707866</TD>
-      <TD>209.07865168539325</TD>
-      <TD>3602.782608695652</TD>
+      <TD>982</TD>
+      <TD>2</TD>
+      <TD>49263</TD>
      </TR>
      <TR>
-      <TD>302.5</TD>
-      <TD>131.99324324324326</TD>
-      <TD>3572.3623188405795</TD>
+      <TD>982</TD>
+      <TD>2</TD>
+      <TD>49263</TD>
      </TR>
      <TR>
-      <TD>162.05882352941177</TD>
-      <TD>199.80882352941177</TD>
-      <TD>3545</TD>
+      <TD>1006</TD>
+      <TD>2</TD>
+      <TD>49202</TD>
      </TR>
      <TR>
-      <TD>172.62745098039215</TD>
-      <TD>370.70588235294116</TD>
-      <TD>3539.0434782608695</TD>
+      <TD>1102</TD>
+      <TD>2</TD>
+      <TD>48798</TD>
      </TR>
      <TR>
-      <TD>428.67241379310343</TD>
-      <TD>114.08620689655173</TD>
-      <TD>3538.057971014493</TD>
+      <TD>1108</TD>
+      <TD>2</TD>
+      <TD>48771</TD>
      </TR>
      <TR>
-      <TD>192.1076923076923</TD>
-      <TD>201.4923076923077</TD>
-      <TD>3536.1159420289855</TD>
+      <TD>209</TD>
+      <TD>847</TD>
+      <TD>15582.555555555555</TD>
      </TR>
      <TR>
-      <TD>347.39622641509436</TD>
-      <TD>427.9811320754717</TD>
-      <TD>3534.8985507246375</TD>
+      <TD>212</TD>
+      <TD>844</TD>
+      <TD>13977.888888888889</TD>
      </TR>
      <TR>
-      <TD>68.88679245283019</TD>
-      <TD>429.0188679245283</TD>
-      <TD>3514.0434782608695</TD>
+      <TD>1013</TD>
+      <TD>500</TD>
+      <TD>12548.333333333334</TD>
      </TR>
     </TABLEDATA>
    </DATA>

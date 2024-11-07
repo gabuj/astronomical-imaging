@@ -75,7 +75,7 @@ for i, (y, x) in enumerate(centroids, start=1):
 df = pd.DataFrame(galaxies)
 
 #only pick out top 10 high intensity galaxies
-df = df.nlargest(10, "intensity")
+df_largest = df.nlargest(10, "intensity")
 
 vot_file = "galaxies.vot"
 #transform df to cat file
