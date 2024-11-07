@@ -73,6 +73,10 @@ for i, (y, x) in enumerate(centroids, start=1):
 
 #create csv file with geader x, y and intensity and values of the galaxies
 df = pd.DataFrame(galaxies)
+
+#only pick out top 10 high intensity galaxies
+df = df.nlargest(10, "intensity")
+
 vot_file = "galaxies.vot"
 #transform df to cat file
 cat_file = "galaxies.cat"
