@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import creating_fake_image
 import finding_center_radius
-
+import pandas as pd
+import  takeout_bleeing
+import background_estimation
 #parameters to create fake image:
 image_size = (1028, 1028)  # Size of the image (512x512 pixels)
 centers = [(200, 200), (300, 300), (400, 400)]
@@ -13,7 +15,7 @@ sigmas = [4, 5, 6]
 noise_level = 20
 background_value= 100
 
-#create the datt
+#create the data
 # data=creating_fake_image.create_fake_image(image_size, centers, galaxy_peaks, sigmas,background_value,noise_level)
 
 #without making the data each time can just import it
@@ -21,13 +23,33 @@ data_path='xy_intensity/fake_image.npy'
 data=np.load(data_path)
 
 
+#parameters for the background estimation
+fraction_bin=5 #num bins is data shape/fraction_bin
+sigmas_thershold = 1 #how many sigmas of std after background is the threshold
+
+#paramters for finding centers and radius
+#set max radius being max distance from center to  edge of image    IMRPVOE THIS
+max_radius=int(np.sqrt(data.shape[0]**2+data.shape[1]**2)/10)
+backgroundfraction_tolerance=0.9
+
+background_thershold=background_estimation.finding_background(data, fraction_bin, sigmas_thershold)
+
+
+#bleeding centerss
+bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776)] #list of (y, x) coordinates of the centers of the bleeding regions
+
 #show the image
 plt.imshow(data, cmap='gray')
 plt.colorbar()
 plt.show()
 
 
-centers_radii=finding_center_radius.finding_centers_radii(data)
+#take out the bleeding regions
+# data=takeout_bleeing.takeou_bleeing(data,bleeding_centers,background_thershold)
+
+#still have to do: take out bad data
+
+centers_radii=finding_center_radius.finding_centers_radii(data,max_radius,backgroundfraction_tolerance,background_thershold)
 
 # Define the Sérsic profile
 def sersic_profile(r, I_e, r_e, n):
@@ -74,11 +96,13 @@ for y_center, x_center, radius in centers_radii:
     I_e, r_e, n, I_e_err, r_e_err, n_err = fit_sersic(data, x_center, y_center, radius, r)
     total_fluxes.append(flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[0])
     total_fluxes_err.append(flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[1])
+    
+    #to check if doinf correct job create own image with centers, raii and intensity found and see if same aas old image
     galaxy_profile = sersic_profile(r, I_e, r_e, n)
     #add the galaxy profile around its center
     data_with_star_positions += galaxy_profile
     
-# plot original image and model image
+# plot original image and created model image
 plt.figure(figsize=(10, 5))
 plt.subplot(1, 2, 1)
 plt.imshow(data, cmap='gray', origin='lower')
@@ -91,3 +115,48 @@ plt.show()
 for i in range(len(total_fluxes)):
     print(f"Total flux for galaxy {i + 1}: {total_fluxes[i]} +/- {total_fluxes_err[i]}")
     
+    
+    
+    
+    
+#CREATE CATALOG FILE
+#how many largest galaxy do you want to see?
+num_largest = 10
+
+
+#create dictionary with x and y coordinates and intensity
+galaxies = []
+for i, (y, x, radius) in enumerate(centers_radii):
+    galaxy = {"x": x, "y": y, "intensity": total_fluxes[i]}
+    galaxies.append(galaxy)
+
+#create csv file with geader x, y and intensity and values of the galaxies
+df = pd.DataFrame(galaxies)
+#only pick out top 10 high intensity galaxies
+df_largest = df.nlargest(num_largest, "intensity")
+
+vot_file = 'xy_intensity/galaxy_catalog.vot'
+vot_highintensity_file = "xy_intensity/highestintensity_galaxies.vot"
+#transform df to cat file
+cat_file = 'xy_intensity/galaxy_catalog.cat'
+cat_highintensity_file = "xy_intensity/highestintensity_galaxies.cat"   
+
+with open(cat_file, "w") as f:
+    f.write("# x y intensity\n")
+    for i, row in df.iterrows():
+        f.write(f"{row['x']} {row['y']} {row['intensity']}\n")
+        
+with open(cat_highintensity_file, "w") as f:
+    f.write("# x y intensity\n")
+    for i, row in df_largest.iterrows():
+        f.write(f"{row['x']} {row['y']} {row['intensity']}\n")
+
+#transform from df to votable file
+from astropy.table import Table
+from astropy.io.votable import writeto
+vot_file = "galaxies.vot"
+table= Table.from_pandas(df)
+writeto(table, vot_file)
+print("vot File created")
+table_highintensity= Table.from_pandas(df_largest)
+writeto(table_highintensity, vot_highintensity_file)

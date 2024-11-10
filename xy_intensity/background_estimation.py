@@ -6,15 +6,11 @@ from scipy.optimize import curve_fit
 def gaussian(x, a, std, m):
     return a *(1/(np.sqrt(2*np.pi)*std))* np.exp(-0.5 * ((x - m) / std) ** 2)
 
-def finding_background(data):
-    fraction_bin=5
+def finding_background(data, fraction_bin, sigmas_thershold):
     num_bins = np.mean(data.shape)/fraction_bin
     #only analyse the part of data close to max value when fitting the gaussian
     near_max = int(num_bins/fraction_bin)
-
-    #how many sigmas of std after background is the threshold
-    sigmas_thershold = 1
-    
+   
     
     
     

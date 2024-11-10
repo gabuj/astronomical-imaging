@@ -3,14 +3,11 @@ from scipy.ndimage import gaussian_filter
 import background_estimation
 import matplotlib.pyplot as plt
 # Loop to detect galaxies until no significant peak remains
-def finding_centers_radii(image_data):
+
+def finding_centers_radii(image_data,max_radius,backgroundfraction_tolerance,background_thershold):
     #PARAMETERS WE CAN CORRECT
-    background_thershold=background_estimation.finding_background(image_data)
-    #set max radius being max distance from center to  edge of image    IMRPVOE THIS
-    max_radius=int(np.sqrt(image_data.shape[0]**2+image_data.shape[1]**2)/10)
-    backgroundfraction_tolerance=0.9
     
-    
+
     
     
     
