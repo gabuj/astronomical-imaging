@@ -37,7 +37,7 @@ def radial_profile(data, x_center, y_center, max_radius, r):
 
 # Fit the Sérsic profile to the radial data
 def fit_sersic(data, x_center, y_center, max_radius, r):
-    radii, intensities = radial_profile(data, x_center, y_center, max_radius)
+    radii, intensities = radial_profile(data, x_center, y_center, max_radius, r)
     I_e_guess = np.max(intensities)
     r_e_guess = max_radius / 2
     n_guess = 2
@@ -61,6 +61,7 @@ data_with_star_positions = np.zeros(data.shape)
 total_fluxes = []
 total_fluxes_err = []
 for y_center, x_center, radius in centers_radii:
+    y, x = np.indices(data.shape)
     r = np.sqrt((x - x_center)**2 + (y - y_center)**2)
     #convert to integer for binning
     r = r.astype(int)
@@ -83,4 +84,8 @@ plt.show()
 
 for i in range(len(total_fluxes)):
     print(f"Total flux for galaxy {i + 1}: {total_fluxes[i]} +/- {total_fluxes_err[i]}")
+    
+    
+    
+#HOW DO I KNOW WHICH FLUX TO EXPECT??
     
