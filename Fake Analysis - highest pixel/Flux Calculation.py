@@ -3,7 +3,7 @@ import numpy as np
 from scipy.ndimage import gaussian_filter
 
 # Load the FITS file
-file_path = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Astro/Fits_Data/fakeimage - 4.fits"
+file_path = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Astro/Fits_Data/fakeimage - 5.fits"
 with fits.open(file_path) as hdul:
     image_data = hdul[0].data.copy()  # Copy of the 2D array of pixel values
 
