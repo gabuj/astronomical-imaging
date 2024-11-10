@@ -31,8 +31,17 @@ def create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_valu
         image_data = add_galaxy(image_data, center[0], center[1], galaxy_peak, sigma)
     return image_data
 
-# image_data = create_fake_image(image_size, centers, galaxy_peaks, sigmas, noise_level)
-# #show the image
-# plt.imshow(image_data, cmap='gray')
-# plt.colorbar()
-# plt.show()
+#parameters to create fake image:
+image_size = (1028, 1028)  # Size of the image (512x512 pixels)
+centers = [(200, 200), (300, 300), (400, 400)]
+galaxy_peaks = [2000, 1500, 6000]
+sigmas = [4, 5, 6]
+noise_level = 20
+background_value= 100
+
+
+# image_data = create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_value, noise_level)
+# #save image as npy file
+# data_path='xy_intensity/fake_image.npy'
+# np.save(data_path, image_data)
+ 

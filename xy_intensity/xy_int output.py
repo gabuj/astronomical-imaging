@@ -13,8 +13,14 @@ sigmas = [4, 5, 6]
 noise_level = 20
 background_value= 100
 
+#create the datt
+# data=creating_fake_image.create_fake_image(image_size, centers, galaxy_peaks, sigmas,background_value,noise_level)
 
-data=creating_fake_image.create_fake_image(image_size, centers, galaxy_peaks, sigmas,background_value,noise_level)
+#without making the data each time can just import it
+data_path='xy_intensity/fake_image.npy'
+data=np.load(data_path)
+
+
 #show the image
 plt.imshow(data, cmap='gray')
 plt.colorbar()
