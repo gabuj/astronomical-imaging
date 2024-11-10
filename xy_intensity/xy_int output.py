@@ -3,25 +3,25 @@ import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
 import creating_fake_image
+import finding_center_radius
 
 #parameters to create fake image:
-image_size = (512, 512)  # Size of the image (512x512 pixels)
-centers = [(200, 200)]
-galaxy_peaks = [200]
-sigmas = [20]
-noise_level = 10 
-data=creating_fake_image.create_fake_image(image_size, centers, galaxy_peaks, sigmas, noise_level)
+image_size = (1028, 1028)  # Size of the image (512x512 pixels)
+centers = [(200, 200), (300, 300), (400, 400)]
+galaxy_peaks = [2000, 1500, 6000]
+sigmas = [4, 5, 6]
+noise_level = 20
+background_value= 100
+
+
+data=creating_fake_image.create_fake_image(image_size, centers, galaxy_peaks, sigmas,background_value,noise_level)
 #show the image
 plt.imshow(data, cmap='gray')
 plt.colorbar()
 plt.show()
 
 
-centers_radii=[]
-for i, center in enumerate(centers):
-    y_center, x_center = center
-    radius = sigmas[i] * 1.6
-    centers_radii.append((y_center, x_center, radius))
+centers_radii=finding_center_radius.finding_centers_radii(data)
 
 # Define the Sérsic profile
 def sersic_profile(r, I_e, r_e, n):
@@ -37,7 +37,7 @@ def radial_profile(data, x_center, y_center, max_radius, r):
 
 # Fit the Sérsic profile to the radial data
 def fit_sersic(data, x_center, y_center, max_radius, r):
-    radii, intensities = radial_profile(data, x_center, y_center, max_radius)
+    radii, intensities = radial_profile(data, x_center, y_center, max_radius, r)
     I_e_guess = np.max(intensities)
     r_e_guess = max_radius / 2
     n_guess = 2
@@ -61,6 +61,7 @@ data_with_star_positions = np.zeros(data.shape)
 total_fluxes = []
 total_fluxes_err = []
 for y_center, x_center, radius in centers_radii:
+    x, y = np.indices(data.shape)
     r = np.sqrt((x - x_center)**2 + (y - y_center)**2)
     #convert to integer for binning
     r = r.astype(int)
