@@ -1,34 +1,59 @@
-from astropy.io import fits
-import pandas as pd
+from scipy.optimize import curve_fit
+import numpy as np
+import matplotlib.pyplot as plt
+import numpy as np
 
-# Load the FITS file
-file_path = 'fits_file/mosaic.fits'
-with fits.open(file_path) as hdulist:
-    # Access the primary image data
-    #HDUList stores multiple sets of information about
-    #the FITS file
-    image_data = hdulist[0].data
+def find_center_and_radius(data):
+    # Assume I have a method to find the center and radius of the galaxy
+    x_center, y_center, radius = 0, 0, 0
+    return x_center, y_center, radius
 
-# Prepare a list to store only a limited number of pixel data
-pixel_data = []
+#assume I have full data
+datafile = 'xy_int.txt'
+data=np.load(datafile)
+#Assume I have method to find the center and radius of the galaxy
+x_center, y_center, radius = find_center_and_radius(data)
 
-# Set the limit to process only the first 1000 pixels
-pixel_limit = 10000
-count = 0
 
-# Iterate over the 2D array of image data to extract intensity and position
-for y in range(image_data.shape[0]):
-    for x in range(image_data.shape[1]):
-        intensity = image_data[y, x]
-        pixel_data.append({'x': x, 'y': y, 'intensity': intensity})
-        count += 1
-        if count >= pixel_limit:
-            break
-    if count >= pixel_limit:
-        break
+# Define the Sérsic profile
+def sersic_profile(r, I_e, r_e, n):
+    b_n = 1.9992 * n - 0.3271  # Approximate value for b_n
+    return I_e * np.exp(-b_n * ((r / r_e)**(1/n) - 1))
 
-# Convert the limited list to a DataFrame for easier viewing
-df = pd.DataFrame(pixel_data)
+# Create radial distances and intensities for the galaxy
+def radial_profile(data, x_center, y_center, max_radius):
+    y, x = np.indices(data.shape)
+    r = np.sqrt((x - x_center)**2 + (y - y_center)**2)
+    radial_distances = np.arange(1, max_radius)
+    radial_intensity = [data[(r >= rad - 1) & (r < rad + 1)].mean() for rad in radial_distances]
+    return radial_distances, radial_intensity
 
-# Display the limited DataFrame (for demonstration, using print here)
-print(df)
+# Fit the Sérsic profile to the radial data
+def fit_sersic(data, x_center, y_center, max_radius):
+    radii, intensities = radial_profile(data, x_center, y_center, max_radius)
+    I_e_guess = np.max(intensities)
+    r_e_guess = max_radius / 2
+    n_guess = 2
+    popt, covt = curve_fit(sersic_profile, radii, intensities, p0=[I_e_guess, r_e_guess, n_guess])
+    I_e, r_e, n = popt
+    I_e_err, r_e_err, n_err = np.sqrt(np.diag(covt))
+    print(f"I_e: {I_e} +/- {I_e_err}")
+    print(f"r_e: {r_e} +/- {r_e_err}")
+    print(f"n: {n} +/- {n_err}")
+    return I_e, r_e, n, I_e_err, r_e_err, n_err
+
+centers_radii=[(y_center,x_center,radius)]
+#create data with bakcground=0 and star positions with their intensity
+data_with_star_positions = np.zeros(data.shape)
+
+for radius, y_center, x_center in centers_radii:
+    I_e, r_e, n, I_e_err, r_e_err, n_err = fit_sersic(data, x_center, y_center, radius)
+    y, x = np.indices(data.shape)
+    r = np.sqrt((x - x_center)**2 + (y - y_center)**2)
+    galaxy_profile = sersic_profile(r, I_e, r_e, n)
+    #add the galaxy profile around its center
+    data_with_star_positions += galaxy_profile
+    
+plt.imshow(data_with_star_positions, cmap='hot', interpolation='nearest')
+plt.show()
+    
