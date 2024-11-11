@@ -4,14 +4,17 @@ import numpy as np
 
 #data is contained in cat file
 filename='xy_intensity/galaxy_catalog.cat'
-data = np.loadtxt(filename, delimiter=' ', skiprows=1,usecols=(2))
-print(f"number of galaxies: {len(data)}")
+fluxes,fluxes_err = np.loadtxt(filename, delimiter=' ', skiprows=1,usecols=(2,3), unpack=True)
+print(f"number of galaxies: {len(fluxes)}")
 num_bins = 8
 # Calculate histogram bin counts and bin edges
 #convert from pixell to magnitude
-data = -2.5 * np.log10(data)
-counts, bin_edges = np.histogram(data, bins=num_bins)
+magnitude = -2.5 * np.log10(fluxes)
+magnitude_err = 2.5/np.log(10)*fluxes_err/fluxes
 
+counts, bin_edges = np.histogram(fluxes, bins=num_bins)
+
+#how do i estimate magnitude error?
 # Calculate bin centers as the midpoint between each bin edge
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 

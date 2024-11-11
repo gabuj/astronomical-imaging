@@ -27,7 +27,6 @@ def finding_centers_radii(image_data,max_radius,backgroundfraction_tolerance,bac
         # Find the coordinates of the highest pixel in the image
         highest_pixel_coords = np.unravel_index(np.argmax(image_data), image_data.shape)
         center_y, center_x = highest_pixel_coords
-        galaxy_count += 1
 
         # Mark the center of the galaxy in black on the output image
         output_image[center_y, center_x] = image_data.min()  # Mark galaxy center in black
@@ -92,11 +91,14 @@ def finding_centers_radii(image_data,max_radius,backgroundfraction_tolerance,bac
         # Mask out the detected galaxy region in image_data to prevent re-detection
         mask_radius = threshold_radius + 1  # Slightly larger than the detected radius
         image_data[radii <= mask_radius] = background_threshold - 1  # Set to background - 1
-
+        #if radius is <2, we can't detect the galaxy
+        if threshold_radius<2:
+            continue
+        
         print(f"Galaxy {galaxy_count} - Radius: {threshold_radius}, Center: ({center_x}, {center_y})")
         centers_list.append((center_y,center_x))
         radii_list.append(threshold_radius)
-
+        galaxy_count += 1
     # Print the total number of galaxies detected
     print(f"Total number of galaxies detected: {galaxy_count}")
 

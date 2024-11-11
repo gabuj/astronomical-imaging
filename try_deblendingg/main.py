@@ -23,7 +23,7 @@ distant2_data_path='fake_files/fake_image_2distantbright.npy'
 distant3_data_path='try_deblendingg/fake_image_2distantbright.npy'
 data=np.load(distant2_data_path)
 
-
+original_data=np.copy(data)
 #parameters for the background estimation
 fraction_bin=4 #num bins is data shape/fraction_bin
 sigmas_thershold = 3#how many sigmas of std after background is the threshold
@@ -32,6 +32,18 @@ sigmas_thershold = 3#how many sigmas of std after background is the threshold
 #set max radius being max distance from center to  edge of image    IMRPVOE THIS
 max_radius=int(np.sqrt(data.shape[0]**2+data.shape[1]**2)/4)
 backgroundfraction_tolerance=0.9
+
+
+
+#final files parameters
+vot_file = 'try_deblendingg/galaxy_catalog.vot'
+vot_highintensity_file = "try_deblendingg/highestintensity_galaxies.vot"
+#transform df to cat file
+cat_file = 'try_deblendingg/galaxy_catalog.cat'
+cat_highintensity_file = "try_deblendingg/highestintensity_galaxies.cat"   
+
+
+
 
 # background_thershold=background_estimation.finding_background(data, fraction_bin, sigmas_thershold)
 
@@ -93,12 +105,18 @@ def flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err):
     return total_flux, total_flux_err
 
 
+def otherway_flux_within_radius(data, x_center, y_center, max_radius, r):
+    radii, intensities = radial_profile(data, x_center, y_center, max_radius, r)
+    total_flux = np.sum(intensities)
+    total_flux_err = np.sqrt(np.sum(intensities)) #not correct but don't know how to do it
+    return total_flux, total_flux_err
 
 #create data with bakcground=0 and star positions with their intensity
 data_with_star_positions = np.zeros(data.shape)
 
 total_fluxes = []
 total_fluxes_err = []
+data=original_data
 for i, center in enumerate(centers_list):
     
     y_center, x_center = center
@@ -106,9 +124,16 @@ for i, center in enumerate(centers_list):
     #convert to integer for binning
     r = np.sqrt((x - x_center)**2 + (y - y_center)**2)
     r = r.astype(int)
-    I_e, r_e, n, I_e_err, r_e_err, n_err = fit_sersic(data, x_center, y_center, radius, r)
-    total_fluxes.append(flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[0])
-    total_fluxes_err.append(flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[1])
+    try:
+        I_e, r_e, n, I_e_err, r_e_err, n_err = fit_sersic(data, x_center, y_center, radius, r)
+        total_fluxes.append(flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[0])
+        total_fluxes_err.append(flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[1])
+    except RuntimeError:
+        print(f"Could not fit Sérsic profile for galaxy {i + 1}")
+        #fit in another way
+        total_fluxes.append(otherway_flux_within_radius(data, x_center, y_center, radius, r)[0])
+        total_fluxes_err.append(otherway_flux_within_radius(data, x_center, y_center, radius, r)[1])
+        continue
     
     #to check if doinf correct job create own image with centers, raii and intensity found and see if same aas old image
     galaxy_profile = sersic_profile(r, I_e, r_e, n)
@@ -139,20 +164,14 @@ num_largest = 10
 
 #create dictionary with x and y coordinates and intensity
 galaxies = []
-for i, (y, x, radius) in enumerate(centers_radii):
-    galaxy = {"x": x, "y": y, "intensity": total_fluxes[i]}
+for i, (y, x) in enumerate(centers_list):
+    galaxy = {"x": x, "y": y, "intensity": total_fluxes[i],"intensity error": total_fluxes_err[i]}
     galaxies.append(galaxy)
 
 #create csv file with geader x, y and intensity and values of the galaxies
 df = pd.DataFrame(galaxies)
 #only pick out top 10 high intensity galaxies
 df_largest = df.nlargest(num_largest, "intensity")
-
-vot_file = 'xy_intensity/galaxy_catalog.vot'
-vot_highintensity_file = "xy_intensity/highestintensity_galaxies.vot"
-#transform df to cat file
-cat_file = 'xy_intensity/galaxy_catalog.cat'
-cat_highintensity_file = "xy_intensity/highestintensity_galaxies.cat"   
 
 with open(cat_file, "w") as f:
     f.write("# x y intensity\n")
