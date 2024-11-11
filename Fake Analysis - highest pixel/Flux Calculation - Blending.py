@@ -3,13 +3,12 @@ import numpy as np
 from scipy.ndimage import gaussian_filter
 
 # Load the FITS file
-file_path = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Astro/Fits_Data/fakeimage - 6 - blending.fits"
+file_path = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Astro/Fits_Data/fakeimage - 11.fits"
 with fits.open(file_path) as hdul:
     image_data = hdul[0].data.copy()  # Copy of the 2D array of pixel values
 
 # Parameters
 background_threshold = 1  # Consider anything less than 1 as background
-max_radius = 100  # Limit search radius for a more realistic boundary
 output_image = image_data.copy()  # Image for marking centers and circles
 galaxy_count = 0  # Counter for detected galaxies
 
@@ -26,8 +25,8 @@ while True:
     galaxy_count += 1
     print(f"Galaxy {galaxy_count} detected at Center: ({center_x}, {center_y}), Peak Brightness: {highest_pixel_value}")
 
-    # Mark the center of the first galaxy in black on the output image
-    output_image[center_y, center_x] = image_data.min()  # First galaxy center in black
+    # Mark the center of the galaxy in black on the output image
+    output_image[center_y, center_x] = image_data.min()  # Mark galaxy center in black
     print(f"Marked center of Galaxy {galaxy_count} at ({center_x}, {center_y}) in black")
 
     # Step 2: Calculate radial distances from the highest pixel (assumed center)
@@ -36,7 +35,8 @@ while True:
     radii = radii.astype(int)
 
     # Step 3: Calculate the radial intensity profile by averaging pixel values at each radius
-    radial_profile = np.array([image_data[radii == r].mean() for r in range(max_radius)])
+    max_possible_radius = min(image_data.shape) // 2  # Maximum radius based on image dimensions
+    radial_profile = np.array([image_data[radii == r].mean() if np.any(radii == r) else 0 for r in range(max_possible_radius)])
 
     # Smooth the radial profile to reduce noise
     smoothed_profile = gaussian_filter(radial_profile, sigma=2)
@@ -48,49 +48,53 @@ while True:
     blending_detected = False
     boundary_radius = None
 
-    for i in range(len(gradient) - 1):
+    # Step 4: Blending detection condition
+    for i in range(len(smoothed_profile) - 1):
         current_radius = i + 1
         radius_values = image_data[radii == current_radius]  # Extract pixel values at this radius
 
-        if np.sum(radius_values < 2) >= 0.7 * len(radius_values) and np.any(radius_values > 20):
+        # Check blending condition: 70% of values below 2 and at least one value above 20
+        if np.sum(radius_values < 5) >= 0.7 * len(radius_values) and np.any(radius_values > 20):
             blending_detected = True
             boundary_radius = i  # Mark the boundary for blending
             print(f"Blending detected for Galaxy {galaxy_count} at radius {boundary_radius}")
             break
+        
+        # If we've reached a radius of 70 without detecting blending, exit and proceed with non-blending
+        elif current_radius >= 70:
+            blending_detected = False
+            print(f"No blending detected within radius 70 for Galaxy {galaxy_count}. Proceeding with non-blending case.")
+            break
 
-    # After the loop, if blending was not detected, set blending_detected to False
+    # If blending is not detected, determine the boundary based on background threshold
     if not blending_detected:
-        print(f"No blending detected for Galaxy {galaxy_count} after checking up to radius {max_radius}.")
-        blending_detected = False
+        threshold_radius = None
+        for r in range(len(smoothed_profile)):
+            # Stop expanding as soon as the intensity falls below background threshold
+            if smoothed_profile[r] < background_threshold:
+                threshold_radius = r
+                print(f"Galaxy {galaxy_count} boundary detected at radius {threshold_radius}")
+                break
 
-    # Step 4: Determine the boundary for a single galaxy if no blending is detected
-    if not blending_detected:
-        valid_drops = []
-        for j in range(1, len(gradient) - 1):
-            p1 = smoothed_profile[j]
-            p2 = smoothed_profile[j + 1]
-            if 0.8 <= p2 < 1:
-                gradient_value = gradient[j]
-                valid_drops.append((j, gradient_value))
-
-        if valid_drops:
-            valid_drops = sorted(valid_drops, key=lambda x: x[0])
-            threshold_radius = valid_drops[0][0]
-        else:
-            raise ValueError("No valid drop points found - check the image or algorithm settings.")
+        # Error handling if no boundary is found (unlikely if there is a background threshold)
+        if threshold_radius is None:
+            raise ValueError("No valid boundary found - check the image or algorithm settings.")
     else:
         # For blending case: use the boundary_radius detected
         threshold_radius = boundary_radius
 
     # Draw the circle for the detected boundary
     circle_mask = (radii >= threshold_radius - 1) & (radii <= threshold_radius + 1)
-    output_image[circle_mask] = output_image.max()  # First boundary in white
+    output_image[circle_mask] = output_image.max()  # Boundary in white
 
     # Mask out the detected galaxy region in image_data to prevent re-detection
     mask_radius = threshold_radius + 1  # Slightly larger than the detected radius
     image_data[radii <= mask_radius] = background_threshold  # Mask with background level to avoid re-detection
 
     print(f"Galaxy {galaxy_count} - Radius: {threshold_radius}, Center: ({center_x}, {center_y})")
+
+# Print the total number of galaxies detected
+print(f"Total number of galaxies detected: {galaxy_count}")
 
 # Step 9: Save the modified data to a new FITS file with circles and centers marked
 output_path = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Astro/Fits_Data/fakeimage_results.fits"
