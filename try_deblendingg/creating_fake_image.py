@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
-
+import os  # Import the os module to open files
 
 def gaussian(x, mu, sigma):
     return np.exp(-np.power(x - mu, 2.) / (2 * np.power(sigma, 2.)))
@@ -43,11 +43,14 @@ def create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_valu
 
 #parameters to create fake image:
 image_size = (1028, 1028)  # Size of the image (512x512 pixels)
-centers = [(200, 200)]
+centers = [(400, 400)]
+#Similar peak to actual data
 galaxy_peaks = [10000]
-sigmas = [4]
+sigmas = [30]
 noise_level = 20
-background_value= 100
+#making background level similar to actual data
+background_value= 3481
+#Sersic ns (make galaxy less centred)
 ns=[0.5]
 
 #FITS File generation image
@@ -61,6 +64,8 @@ hdu = fits.PrimaryHDU(image_data)
 hdul = fits.HDUList([hdu])
 hdul.writeto(data_path, overwrite=True)
 print(f"File saved to {data_path}")
+
+os.system(f"open {data_path}")
 
 # image_data = create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_value, noise_level,ns)
 # #save image as npy file
