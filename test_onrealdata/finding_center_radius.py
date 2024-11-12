@@ -11,7 +11,7 @@ def finding_centers_radii(image_data,background_threshold,max_possible_radius,ov
     overthresh_persentage=0.6 #was 0.7
     min_intensity_stillgalaxy=background_threshold*1.1 #was 20
     max_intensity_no_galaxy=background_threshold*0.8 #was 5
-    # Parameters
+    # fixed Parameters
     output_image = image_data.copy()  # Image for marking centers and circles
     galaxy_count = 1  # Counter for detected galaxies
 

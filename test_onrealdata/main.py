@@ -7,15 +7,53 @@ import finding_center_radius
 import pandas as pd
 import  takeout_bleeing
 import background_estimation
-#parameters to create fake image:
-image_size = (1028, 1028)  # Size of the image (512x512 pixels)
-centers = [(200, 200),(204, 204),(600,600),(800,800)] # List of (y, x) coordinates of the centers of the galaxies
-galaxy_peaks = [2000, 6000, 10000, 15000] # List of peak intensities of the galaxies
-sigmas = [4, 6,10,4]  # List of standard deviations of the galaxies
-ns=[4,4,4,4] #List of n values for sersic profile
-ns= [0.5,0.5,0.5,0.5]
-noise_level = 20
-background_value= 100
+from astropy.io import fits
+import bad_data_clean
+#gete data
+#open file
+path='fits_file/mosaic.fits'
+hdulist = fits.open(path)
+
+data = hdulist[0].data
+
+#close file
+hdulist.close()
+
+#show initial image
+plt.imshow(data, cmap='gray', origin='lower')
+plt.colorbar()
+plt.title('Initial Image')
+plt.show()
+
+
+#parameters for the background estimation
+fraction_bin=4 #num bins is data shape/fraction_bin
+sigmas_thershold = 3#how many sigmas of std after background is the threshold
+#find background
+background_thershold=background_estimation.finding_background(data, fraction_bin, sigmas_thershold)
+
+#bleeding centerss
+bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776)] #list of (y, x) coordinates of the centers of the bleeding regions
+#take away bleeing
+data=takeout_bleeing.takeou_bleeing(data,bleeding_centers,background_thershold)
+
+#still have to do: take out bad data
+# baddata_coords=[(0,0,400,400)] #top left and top right corner of region
+# data=bad_data_clean.takeout_baddata(data,baddata_coords) 
+
+
+#show cleaned image
+#show image in zscale
+plt.imshow(data, cmap='gray', origin='lower')
+plt.colorbar()
+plt.title('Cleaned Image')
+plt.show()
+
+
+#use only part of the data
+size=4000
+data=data[0:size,0:size]
+
 
 #finding radius paramters
 overexposed_threshold=65535
@@ -23,18 +61,9 @@ background_gain=3 #how many times more than radius is local background radius
 #create the data
 # data=creating_fake_image.create_fake_image(image_size, centers, galaxy_peaks, sigmas,background_value,noise_level,ns)
 
-#without making the data each time can just import it
-distant2_data_path='fake_files/fake_image_2distantbright.npy'
-distant3_data_path='try_deblendingg/fake_image_2distantbright.npy'
-data_blended='fake_files/fake_image_sersicblended_0505.npy'
-data_LESSblended='fake_files/fake_image_sersicLESSblended_0505.npy'
-data_EVENLESSblended='fake_files/fake_image_sersicEVENLESSblended_0505.npy'
-data=np.load(data_LESSblended)
+
 
 original_data=np.copy(data)
-#parameters for the background estimation
-fraction_bin=4 #num bins is data shape/fraction_bin
-sigmas_thershold = 3#how many sigmas of std after background is the threshold
 
 #paramters for finding centers and radius
 #set max radius being max distance from center to  edge of image    IMRPVOE THIS
@@ -53,24 +82,12 @@ cat_highintensity_file = "try_deblendingg/highestintensity_galaxies.cat"
 
 
 
-# background_thershold=background_estimation.finding_background(data, fraction_bin, sigmas_thershold)
 
-background_thershold=background_value+5*noise_level
-
-#bleeding centerss
-bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776)] #list of (y, x) coordinates of the centers of the bleeding regions
 
 #show the image
 plt.imshow(data, cmap='gray')
 plt.colorbar()
 plt.show()
-
-
-#take out the bleeding regions
-# data=takeout_bleeing.takeou_bleeing(data,bleeding_centers,background_thershold)
-
-#still have to do: take out bad data
-
 
 centers_list,radii_list=finding_center_radius.finding_centers_radii(data,background_thershold,max_radius,overexposed_threshold)
 x, y = np.indices(data.shape)
