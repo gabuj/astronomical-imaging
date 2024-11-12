@@ -54,6 +54,12 @@ galaxy_mask=np.copy(data)
 galaxy_mask[bleeding_region==True]=0
 
 #galaxy_mask is data without the bleeding regions
+#show bleeding regions
+plt.figure(figsize=(10, 5))
+plt.title("Bleeding Region")
+plt.imshow(bleeding_region, cmap='gray')
+plt.colorbar()
+plt.show()
 
 
 
