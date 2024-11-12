@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Produced with astropy.io.votable version 6.1.1
+     http://www.astropy.org/ -->
+<VOTABLE version="1.4" xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://www.ivoa.net/xml/VOTable/VOTable-1.4.xsd">
+ <RESOURCE type="results">
+  <TABLE>
+   <FIELD ID="x" datatype="long" name="x"/>
+   <FIELD ID="y" datatype="long" name="y"/>
+   <FIELD ID="intensity" datatype="double" name="intensity"/>
+   <FIELD ID="intensity_error" datatype="double" name="intensity error"/>
+   <DATA>
+    <TABLEDATA>
+     <TR>
+      <TD>201</TD>
+      <TD>201</TD>
+      <TD>3484401.867888306</TD>
+      <TD>153280.54904576627</TD>
+     </TR>
+     <TR>
+      <TD>212</TD>
+      <TD>213</TD>
+      <TD>1614924.8389007922</TD>
+      <TD>417712969765.47375</TD>
+     </TR>
+     <TR>
+      <TD>800</TD>
+      <TD>800</TD>
+      <TD>1388616.937785086</TD>
+      <TD>36517.352886735374</TD>
+     </TR>
+    </TABLEDATA>
+   </DATA>
+  </TABLE>
+ </RESOURCE>
+</VOTABLE>
