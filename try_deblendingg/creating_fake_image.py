@@ -43,15 +43,21 @@ def create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_valu
 
 #parameters to create fake image:
 image_size = (1028, 1028)  # Size of the image (512x512 pixels)
-centers = [(200, 200), (800, 800)]
-galaxy_peaks = [2000, 6000]
-sigmas = [4, 5]
+centers = [(200, 200), (208, 208),(800, 800)]
+galaxy_peaks = [10000, 15000,10000]
+sigmas = [4, 5,4]
 noise_level = 20
 background_value= 100
+ns=[2,2,2]
+ns= [0.5,0.5,0.5]
+ns=[0.5,0.5,0.5]
 
-
-# image_data = create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_value, noise_level)
+# image_data = create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_value, noise_level,ns)
 # #save image as npy file
-# data_path='fake_files/fake_image_2distantbright.npy'
+# data_path='fake_files/fake_image_sersicEVENLESSblended_405.npy'
 # np.save(data_path, image_data)
  
+# #show the image
+# plt.imshow(image_data, cmap='gray')
+# plt.colorbar()
+# plt.show()

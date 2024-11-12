@@ -4,15 +4,16 @@ import background_estimation
 import matplotlib.pyplot as plt
 # Loop to detect galaxies until no significant peak remains
 
-def finding_centers_radii(image_data,max_radius,backgroundfraction_tolerance,background_threshold,max_possible_radius):
+
+def finding_centers_radii(image_data,background_threshold,max_possible_radius,overexposed_threshold):
     #PARAMETERS WE CAN CORRECT
     
-    overthresh_persentage=0.7
-    min_intensity_stillgalaxy=background_threshold*1.2 #was 20
+    overthresh_persentage=0.6 #was 0.7
+    min_intensity_stillgalaxy=background_threshold*1.1 #was 20
     max_intensity_no_galaxy=background_threshold*0.8 #was 5
     # Parameters
     output_image = image_data.copy()  # Image for marking centers and circles
-    galaxy_count = 0  # Counter for detected galaxies
+    galaxy_count = 1  # Counter for detected galaxies
 
     # Loop to detect galaxies until no significant peak remains
     centers_list=[]
@@ -94,6 +95,8 @@ def finding_centers_radii(image_data,max_radius,backgroundfraction_tolerance,bac
         #if radius is <2, we can't detect the galaxy
         if threshold_radius<2:
             continue
+            if highest_pixel_value > overexposed_threshold:
+                continue
         
         print(f"Galaxy {galaxy_count} - Radius: {threshold_radius}, Center: ({center_x}, {center_y})")
         centers_list.append((center_y,center_x))

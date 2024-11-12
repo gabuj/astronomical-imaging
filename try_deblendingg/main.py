@@ -9,7 +9,7 @@ import  takeout_bleeing
 import background_estimation
 #parameters to create fake image:
 image_size = (1028, 1028)  # Size of the image (512x512 pixels)
-centers = [(200, 200),(400, 400),(600,600),(800,800)] # List of (y, x) coordinates of the centers of the galaxies
+centers = [(200, 200),(204, 204),(600,600),(800,800)] # List of (y, x) coordinates of the centers of the galaxies
 galaxy_peaks = [2000, 6000, 10000, 15000] # List of peak intensities of the galaxies
 sigmas = [4, 6,10,4]  # List of standard deviations of the galaxies
 ns=[4,4,4,4] #List of n values for sersic profile
@@ -17,14 +17,19 @@ ns= [0.5,0.5,0.5,0.5]
 noise_level = 20
 background_value= 100
 
-
+#finding radius paramters
+overexposed_threshold=65535
+background_gain=3 #how many times more than radius is local background radius
 #create the data
-data=creating_fake_image.create_fake_image(image_size, centers, galaxy_peaks, sigmas,background_value,noise_level,ns)
+# data=creating_fake_image.create_fake_image(image_size, centers, galaxy_peaks, sigmas,background_value,noise_level,ns)
 
 #without making the data each time can just import it
 distant2_data_path='fake_files/fake_image_2distantbright.npy'
 distant3_data_path='try_deblendingg/fake_image_2distantbright.npy'
-# data=np.load(distant2_data_path)
+data_blended='fake_files/fake_image_sersicblended_0505.npy'
+data_LESSblended='fake_files/fake_image_sersicLESSblended_0505.npy'
+data_EVENLESSblended='fake_files/fake_image_sersicEVENLESSblended_0505.npy'
+data=np.load(data_LESSblended)
 
 original_data=np.copy(data)
 #parameters for the background estimation
@@ -67,7 +72,7 @@ plt.show()
 #still have to do: take out bad data
 
 
-centers_list,radii_list=finding_center_radius.finding_centers_radii(data,max_radius,backgroundfraction_tolerance,background_thershold,max_radius)
+centers_list,radii_list=finding_center_radius.finding_centers_radii(data,background_thershold,max_radius,overexposed_threshold)
 x, y = np.indices(data.shape)
 
 
@@ -78,17 +83,15 @@ def sersic_profile(r, I_e, r_e, n):
     return I_e * np.exp(-b_n * ((r / r_e)**(1/n) - 1))
 
 # Create radial distances and intensities for the galaxy
-def radial_profile(data, x_center, y_center, max_radius, r):
-
-
-        # Step 3: Calculate the radial intensity profile by averaging pixel values at each radius
+def radial_profile(data, max_radius, r):
+    # Step 3: Calculate the radial intensity profile by averaging pixel values at each radius
     radial_distances=np.arange(1,max_radius)
     radial_intensity = np.array([data[r == rad].mean() if np.any(r == r) else 0 for rad in radial_distances])
     return radial_distances, radial_intensity
 
 # Fit the Sérsic profile to the radial data
 def fit_sersic(data, x_center, y_center, max_radius, r):
-    radii, intensities = radial_profile(data, x_center, y_center, max_radius, r)
+    radii, intensities = radial_profile(data, max_radius, r)
     I_e_guess = np.max(intensities)
     r_e_guess = max_radius / 2
     n_guess = 4
@@ -114,6 +117,13 @@ def otherway_flux_within_radius(data, x_center, y_center, max_radius, r):
     total_flux_err = np.sqrt(np.sum(intensities)) #not correct but don't know how to do it
     return total_flux, total_flux_err
 
+def take_away_localbackground(data,radius,r,background_gain):
+    #take away local background value from intensity
+    max_radius=radius*background_gain
+    background_data=data[r<=max_radius]
+    local_background=background_estimation.finding_background(background_data, fraction_bin, sigmas_thershold)
+    local_background_err=0
+    return local_background,local_background_err
 #create data with bakcground=0 and star positions with their intensity
 data_with_star_positions = np.zeros(data.shape)
 
@@ -127,16 +137,29 @@ for i, center in enumerate(centers_list):
     #convert to integer for binning
     r = np.sqrt((x - x_center)**2 + (y - y_center)**2)
     r = r.astype(int)
+    
+     #take away local background value from intensity
+    local_background,local_background_err=take_away_localbackground(data,radius,r,background_gain)
+   
+   
     try:
         I_e, r_e, n, I_e_err, r_e_err, n_err = fit_sersic(data, x_center, y_center, radius, r)
-        total_fluxes.append(flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[0])
-        total_fluxes_err.append(flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[1])
+        flux=flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[0]
+        flux_err=flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[1]
+        flux=flux-local_background
+        
+        total_fluxes.append(flux)
+        total_fluxes_err.append(flux_err)
     except RuntimeError:
         print(f"Could not fit Sérsic profile for galaxy {i + 1}")
         #fit in another way
-        total_fluxes.append(otherway_flux_within_radius(data, x_center, y_center, radius, r)[0])
-        total_fluxes_err.append(otherway_flux_within_radius(data, x_center, y_center, radius, r)[1])
+        flux=otherway_flux_within_radius(data, x_center, y_center, radius, r)[0]
+        flux_err=otherway_flux_within_radius(data, x_center, y_center, radius, r)[1]
+        
+        total_fluxes.append(flux)
+        total_fluxes_err.append(flux_err)
         continue
+    
     
     #to check if doinf correct job create own image with centers, raii and intensity found and see if same aas old image
     galaxy_profile = sersic_profile(r, I_e, r_e, n)

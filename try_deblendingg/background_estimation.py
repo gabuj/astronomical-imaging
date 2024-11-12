@@ -49,7 +49,7 @@ def finding_background(data, fraction_bin, sigmas_thershold):
     print(f"new counts are {new_counts}")
     #we will fit a gaussian to the histogram
 
-    a_guess = max_value
+    a_guess = max_value/np.sqrt(2*np.pi)
     std_guess = max_value/60000
     m_guess = x_max
     p0 = [a_guess, std_guess, m_guess]
@@ -76,7 +76,7 @@ def finding_background(data, fraction_bin, sigmas_thershold):
 
     #set the threshold to 5 times the standard deviation of the gaussian meaning if the pixel intensity is greater than 5*std then it is a star
     thresh = sigmas_thershold*popt[1]+popt[2]
-    thersh_err = np.sqrt(np.diag(pcov)[1]*25 + np.diag(pcov)[2])
+    thersh_err =np.sqrt(np.diag(pcov)[1]*sigmas_thershold**2+np.diag(pcov)[2])
 
     print(f"Threshold: {thresh} +- {thersh_err}")
 

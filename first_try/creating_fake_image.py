@@ -38,10 +38,14 @@ galaxy_peaks = [2000, 1500, 6000]
 sigmas = [4, 5, 6]
 noise_level = 20
 background_value= 100
+ns=[4,4,4]
+# ns= [0.5,0.5,0.5]
+# ns=[4,0.5,4]
+# Create the data
 
 
-# image_data = create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_value, noise_level)
+# image_data = create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_value, noise_level,ns)
 # #save image as npy file
-# data_path='xy_intensity/fake_image.npy'
+# data_path='fake_files/seriscblended_44.npy'
 # np.save(data_path, image_data)
  
