@@ -43,14 +43,24 @@ def create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_valu
 
 #parameters to create fake image:
 image_size = (1028, 1028)  # Size of the image (512x512 pixels)
-centers = [(200, 200), (208, 208),(800, 800)]
-galaxy_peaks = [10000, 15000,10000]
-sigmas = [4, 5,4]
+centers = [(200, 200)]
+galaxy_peaks = [10000]
+sigmas = [4]
 noise_level = 20
 background_value= 100
-ns=[2,2,2]
-ns= [0.5,0.5,0.5]
-ns=[0.5,0.5,0.5]
+ns=[0.5]
+
+#FITS File generation image
+
+# Generate the synthetic image
+image_data = create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_value, noise_level, ns)
+
+# Save the generated image as a FITS file
+data_path = "fake_files/fake_image_1_galaxy.fits"
+hdu = fits.PrimaryHDU(image_data)
+hdul = fits.HDUList([hdu])
+hdul.writeto(data_path, overwrite=True)
+print(f"File saved to {data_path}")
 
 # image_data = create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_value, noise_level,ns)
 # #save image as npy file
