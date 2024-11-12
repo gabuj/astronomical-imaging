@@ -106,7 +106,7 @@ def finding_centers_radii(image_data,background_threshold,max_possible_radius,ov
     print(f"Total number of galaxies detected: {galaxy_count}")
 
     # Step 9: Save the modified data to a new FITS file with circles and centers marked
-    output_path = "/fakeimage_results.fits"
+    output_path = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/fakeimage_results.fits"
     hdu = fits.PrimaryHDU(output_image)
     hdul_with_circles = fits.HDUList([hdu])
     hdul_with_circles.writeto(output_path, overwrite=True)

@@ -59,13 +59,18 @@ ns=[0.5]
 image_data = create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_value, noise_level, ns)
 
 # Save the generated image as a FITS file
-data_path = "fake_files/fake_image_1_galaxy.fits"
+data_path = "fake_files/fake_image_1_realistic.fits"
 hdu = fits.PrimaryHDU(image_data)
 hdul = fits.HDUList([hdu])
 hdul.writeto(data_path, overwrite=True)
 print(f"File saved to {data_path}")
 
+#THIS IS TO AUTOMATICALLY OPEN THE FILE AFTER RUNNING
+
 os.system(f"open {data_path}")
+
+
+#OTHER METHOD
 
 # image_data = create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_value, noise_level,ns)
 # #save image as npy file

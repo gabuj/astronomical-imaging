@@ -1,14 +1,15 @@
 from astropy.io import fits
 import numpy as np
 from scipy.ndimage import gaussian_filter
+import os
 
 # Load the FITS file
-file_path = "fake_files/fake_image_1_galaxy.fits"
+file_path = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/fakeimage_11.fits"
 with fits.open(file_path) as hdul:
     image_data = hdul[0].data.copy()  # Copy of the 2D array of pixel values
 
 # Parameters
-background_threshold = 3481  # Consider anything less than 3481 as background
+background_threshold = 1  # Consider anything less than 3481 as background
 output_image = image_data.copy()  # Image for marking centers and circles
 galaxy_count = 0  # Counter for detected galaxies
 
@@ -66,13 +67,16 @@ while True:
             print(f"No blending detected within radius 70 for Galaxy {galaxy_count}. Proceeding with non-blending case.")
             break
 
-    # If blending is not detected, determine the boundary based on background threshold
+    # If blending is not detected, determine the boundary based on pixel extraction for non-blending
     if not blending_detected:
         threshold_radius = None
         for r in range(len(smoothed_profile)):
-            # Stop expanding as soon as the intensity falls below background threshold
-            if smoothed_profile[r] < background_threshold:
-                threshold_radius = r
+            current_radius = r + 1
+            radius_values = image_data[radii == current_radius]  # Extract pixel values at this radius
+            
+            # Stop expanding as soon as at least one pixel falls below background threshold
+            if np.any(radius_values < background_threshold):
+                threshold_radius = current_radius
                 print(f"Galaxy {galaxy_count} boundary detected at radius {threshold_radius}")
                 break
 
@@ -97,9 +101,11 @@ while True:
 print(f"Total number of galaxies detected: {galaxy_count}")
 
 # Step 9: Save the modified data to a new FITS file with circles and centers marked
-output_path = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Astro/Fits_Data/fakeimage_results.fits"
+output_path = "fake_files/fakeimage_results.fits"
 hdu = fits.PrimaryHDU(output_image)
 hdul_with_circles = fits.HDUList([hdu])
 hdul_with_circles.writeto(output_path, overwrite=True)
 
 print(f"Final output saved to {output_path}")
+
+os.system(f"open {output_path}")
