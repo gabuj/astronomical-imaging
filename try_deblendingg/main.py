@@ -7,6 +7,8 @@ import finding_center_radius
 import pandas as pd
 import  takeout_bleeing
 import background_estimation
+import os
+from astropy.io import fits
 #parameters to create fake image:
 image_size = (1028, 1028)  # Size of the image (512x512 pixels)
 centers = [(200, 200),(204, 204),(600,600),(800,800)] # List of (y, x) coordinates of the centers of the galaxies
@@ -24,14 +26,36 @@ background_gain=3 #how many times more than radius is local background radius
 # data=creating_fake_image.create_fake_image(image_size, centers, galaxy_peaks, sigmas,background_value,noise_level,ns)
 
 #without making the data each time can just import it
-distant2_data_path='fake_files/fake_image_2distantbright.npy'
-distant3_data_path='try_deblendingg/fake_image_2distantbright.npy'
-data_blended='fake_files/fake_image_sersicblended_0505.npy'
-data_LESSblended='fake_files/fake_image_sersicLESSblended_0505.npy'
-data_EVENLESSblended='fake_files/fake_image_sersicEVENLESSblended_0505.npy'
-data=np.load(data_LESSblended)
+# distant2_data_path='fake_files/fake_image_2distantbright.npy'
+# distant3_data_path='try_deblendingg/fake_image_2distantbright.npy'
+# data_blended='fake_files/fake_image_sersicblended_0505.npy'
+# data_LESSblended='fake_files/fake_image_sersicLESSblended_0505.npy'
+# data_EVENLESSblended='fake_files/fake_image_sersicEVENLESSblended_0505.npy'
+# data=np.load(data_LESSblended)
 
-original_data=np.copy(data)
+# Option 2: Load data from .fits files
+distant2_data_path_fits = 'fake_files/fake_image_2distantbright.fits'
+distant3_data_path_fits = 'try_deblendingg/fake_image_2distantbright.fits'
+data_blended_fits = 'fake_files/fake_image_sersicblended_0505.fits'
+data_LESSblended_fits = 'fake_files/fake_image_sersicLESSblended_0505.fits'
+data_EVENLESSblended_fits = 'fake_files/fake_image_sersicEVENLESSblended_0505.fits'
+
+# List of FITS file paths
+fits_files = [
+    'fake_files/fake_image_1_galaxy.fits',
+]
+
+# Loop over each FITS file
+for file_path in fits_files:
+    # Extract a name identifier for each file (e.g., 'fake_image_2distantbright')
+    file_name = os.path.splitext(os.path.basename(file_path))[0]
+
+    # Load the FITS file
+    with fits.open(file_path) as hdul:
+        data = hdul[0].data.copy()  # Copy of the 2D array of pixel values
+
+    original_data = np.copy(data)  # Keep a copy of the original data
+
 #parameters for the background estimation
 fraction_bin=4 #num bins is data shape/fraction_bin
 sigmas_thershold = 3#how many sigmas of std after background is the threshold
@@ -227,3 +251,4 @@ writeto(table, vot_file)
 print("vot File created")
 table_highintensity= Table.from_pandas(df_largest)
 writeto(table_highintensity, vot_highintensity_file)
+
