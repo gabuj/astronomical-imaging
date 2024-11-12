@@ -10,6 +10,9 @@ import background_estimation
 from astropy.io import fits
 import bad_data_clean
 #gete data
+max_localbackground_radius=200
+fraction_bin=max_localbackground_radius*2
+
 #open file
 path='fits_file/mosaic.fits'
 hdulist = fits.open(path)
@@ -27,19 +30,21 @@ plt.show()
 
 
 #parameters for the background estimation
-fraction_bin=4 #num bins is data shape/fraction_bin
-sigmas_thershold = 3#how many sigmas of std after background is the threshold
+fraction_bin_totalbackground=3 #num bins is data shape/fraction_bin
+sigmas_thershold = 5#how many sigmas of std after background is the threshold
 #find background
-background_thershold=background_estimation.finding_background(data, fraction_bin, sigmas_thershold)
-
+background_thershold=background_estimation.finding_background(data, fraction_bin_totalbackground, sigmas_thershold) #problem!!
+background_thershold=3481
 #bleeding centerss
-bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776)] #list of (y, x) coordinates of the centers of the bleeding regions
+bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776),(5,1430)] #list of (y, x) coordinates of the centers of the bleeding regions
 #take away bleeing
 data=takeout_bleeing.takeou_bleeing(data,bleeding_centers,background_thershold)
 
 #still have to do: take out bad data
-# baddata_coords=[(0,0,400,400)] #top left and top right corner of region
-# data=bad_data_clean.takeout_baddata(data,baddata_coords) 
+maxx=data.shape[1]
+maxy=data.shape[0]
+baddata_coords=[[0,0,33,430],[0,0,124,119],[0,0,105,408],[0,2462,126,maxx],[0,0,408,99],[0,0,430,26],[0,0,4518,4],[4516,0,maxy,120],[4504,2161,maxy,maxx],[0,2467,maxy,maxx]] #top left and top right corner of region (y1,x1,y2,x2)
+data=bad_data_clean.takeout_baddata(data,baddata_coords,background_thershold)
 
 
 #show cleaned image
@@ -51,7 +56,7 @@ plt.show()
 
 
 #use only part of the data
-size=4000
+size=600
 data=data[0:size,0:size]
 
 
@@ -73,21 +78,14 @@ backgroundfraction_tolerance=0.9
 
 
 #final files parameters
-vot_file = 'try_deblendingg/galaxy_catalog.vot'
-vot_highintensity_file = "try_deblendingg/highestintensity_galaxies.vot"
+vot_file = 'test_onrealdata/galaxy_catalog.vot'
+vot_highintensity_file = "test_onrealdata/highestintensity_galaxies.vot"
 #transform df to cat file
-cat_file = 'try_deblendingg/galaxy_catalog.cat'
-cat_highintensity_file = "try_deblendingg/highestintensity_galaxies.cat"   
+cat_file = 'test_onrealdata/galaxy_catalog.cat'
+cat_highintensity_file = "test_onrealdata/highestintensity_galaxies.cat"   
 
 
 
-
-
-
-#show the image
-plt.imshow(data, cmap='gray')
-plt.colorbar()
-plt.show()
 
 centers_list,radii_list=finding_center_radius.finding_centers_radii(data,background_thershold,max_radius,overexposed_threshold)
 x, y = np.indices(data.shape)
@@ -102,12 +100,15 @@ def sersic_profile(r, I_e, r_e, n):
 # Create radial distances and intensities for the galaxy
 def radial_profile(data, max_radius, r):
     # Step 3: Calculate the radial intensity profile by averaging pixel values at each radius
-    radial_distances=np.arange(1,max_radius)
+    radial_distances=np.arange(1,max_radius+1)
     radial_intensity = np.array([data[r == rad].mean() if np.any(r == r) else 0 for rad in radial_distances])
+    print(f"radial distances are {radial_distances}")
+    print(f"radial intensities are {radial_intensity}")
     return radial_distances, radial_intensity
 
 # Fit the Sérsic profile to the radial data
 def fit_sersic(data, x_center, y_center, max_radius, r):
+    print(f"max radius is {max_radius}")
     radii, intensities = radial_profile(data, max_radius, r)
     I_e_guess = np.max(intensities)
     r_e_guess = max_radius / 2
@@ -129,16 +130,16 @@ def flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err):
 
 
 def otherway_flux_within_radius(data, x_center, y_center, max_radius, r):
-    radii, intensities = radial_profile(data, x_center, y_center, max_radius, r)
+    radii, intensities = radial_profile(data, max_radius, r)
     total_flux = np.sum(intensities)
     total_flux_err = np.sqrt(np.sum(intensities)) #not correct but don't know how to do it
     return total_flux, total_flux_err
 
 def take_away_localbackground(data,radius,r,background_gain):
     #take away local background value from intensity
-    max_radius=radius*background_gain
+    max_radius=max_localbackground_radius
     background_data=data[r<=max_radius]
-    local_background=background_estimation.finding_background(background_data, fraction_bin, sigmas_thershold)
+    local_background=background_estimation.finding_local_background(background_data, fraction_bin, sigmas_thershold)
     local_background_err=0
     return local_background,local_background_err
 #create data with bakcground=0 and star positions with their intensity
@@ -147,6 +148,7 @@ data_with_star_positions = np.zeros(data.shape)
 total_fluxes = []
 total_fluxes_err = []
 data=original_data
+flux_summed=0
 for i, center in enumerate(centers_list):
     
     y_center, x_center = center
@@ -175,6 +177,7 @@ for i, center in enumerate(centers_list):
         
         total_fluxes.append(flux)
         total_fluxes_err.append(flux_err)
+        flux_summed+=1
         continue
     
     
@@ -196,17 +199,7 @@ plt.show()
 for i in range(len(total_fluxes)):
     print(f"Total flux for galaxy {i + 1}: {total_fluxes[i]} +/- {total_fluxes_err[i]}")
     
-    
-    
-#if n all 0 then gaussian else sersic
-if all(n==0 for n in ns):
-    galaxy_expected_fluxes = [np.pi * peak * sigma**2 for peak, sigma in zip(galaxy_peaks, sigmas)]
-else:
-    galaxy_expected_fluxes = [flux_within_radius(galaxy_peak, sigma, n, 0, 0, 0)[0] for galaxy_peak, sigma, n in zip(galaxy_peaks, sigmas, ns)]
-    #sort by intensity
-    galaxy_expected_fluxes.sort()
-    
-print(f"the expected fluxes are {galaxy_expected_fluxes}")
+print(f"percentage of fluxes that could not be fitted: {flux_summed/len(centers_list)*100}%")
     
     
 #CREATE CATALOG FILE
@@ -226,19 +219,18 @@ df = pd.DataFrame(galaxies)
 df_largest = df.nlargest(num_largest, "intensity")
 
 with open(cat_file, "w") as f:
-    f.write("# x y intensity\n")
+    f.write("# x y intensity intensity error\n")
     for i, row in df.iterrows():
-        f.write(f"{row['x']} {row['y']} {row['intensity']}\n")
+        f.write(f"{row['x']} {row['y']} {row['intensity']} {row['intensity error']}\n")
         
 with open(cat_highintensity_file, "w") as f:
     f.write("# x y intensity\n")
     for i, row in df_largest.iterrows():
-        f.write(f"{row['x']} {row['y']} {row['intensity']}\n")
+        f.write(f"{row['x']} {row['y']} {row['intensity']} {row['intensity error']}\n")
 
 #transform from df to votable file
 from astropy.table import Table
 from astropy.io.votable import writeto
-vot_file = "galaxies.vot"
 table= Table.from_pandas(df)
 writeto(table, vot_file)
 print("vot File created")

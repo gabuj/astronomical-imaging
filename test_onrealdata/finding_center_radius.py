@@ -93,10 +93,10 @@ def finding_centers_radii(image_data,background_threshold,max_possible_radius,ov
         mask_radius = threshold_radius + 1  # Slightly larger than the detected radius
         image_data[radii <= mask_radius] = background_threshold - 1  # Set to background - 1
         #if radius is <2, we can't detect the galaxy
-        if threshold_radius<2:
+        if threshold_radius<3:
             continue
-            if highest_pixel_value > overexposed_threshold:
-                continue
+        if highest_pixel_value > overexposed_threshold:
+            continue
         
         print(f"Galaxy {galaxy_count} - Radius: {threshold_radius}, Center: ({center_x}, {center_y})")
         centers_list.append((center_y,center_x))
