@@ -9,14 +9,17 @@ def gaussian(x, a, std, m):
 def finding_background(data, fraction_bin, sigmas_thershold):
     num_bins = np.mean(data.shape)/fraction_bin
     #only analyse the part of data close to max value when fitting the gaussian
-    near_max = int(num_bins/fraction_bin)
+    if num_bins>20*fraction_bin:
+        near_max = int(num_bins/(200))
+    else:
+        near_max = int(20)
    
     
     
     
     
     num_bins = int(num_bins)
-
+    print(f"num bins are {num_bins}")
     # Calculate histogram bin counts and bin edges
     counts, bin_edges = np.histogram(data.ravel(), bins=num_bins)
 
@@ -83,4 +86,45 @@ def finding_background(data, fraction_bin, sigmas_thershold):
     rel_err = thersh_err/thresh
 
     print(f"Relative error: {rel_err}")
+    return thresh
+
+
+def finding_local_background(data, fraction_bin, sigmas_thershold):
+    num_bins = np.mean(data.shape)/fraction_bin
+    #only analyse the part of data close to max value when fitting the gaussian
+    if num_bins>20*fraction_bin:
+        near_max = int(num_bins/fraction_bin)
+    else:
+        near_max = int(20)
+   
+    
+    
+    
+    
+    num_bins = int(num_bins)
+
+    # Calculate histogram bin counts and bin edges
+    counts, bin_edges = np.histogram(data.ravel(), bins=num_bins)
+
+    # Calculate bin centers as the midpoint between each bin edge
+    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+
+    # Plot histogram of pixel intensities
+    # plt.figure(figsize=(10, 6))
+    # plt.plot(bin_centers, counts, color='black', ls='-',alpha=0.8)
+    # # plt.yscale('log')  # Log scale to better visualize differences in intensity
+    # plt.xlabel('Pixel Intensity')
+    # plt.ylabel('Frequency (Log Scale)')
+    # plt.title('Histogram of Pixel Intensities')
+    # plt.show()
+
+    #find the maximum value
+    max_value = np.max(counts)
+    max_index = np.where(counts == max_value) 
+    max_index = max_index[0][0]
+    x_max = bin_centers[max_index]
+    print(f"local background value: {max_value} at {x_max}")
+    #set the threshold to 5 times the standard deviation of the gaussian meaning if the pixel intensity is greater than 5*std then it is a star
+    thresh = x_max
+
     return thresh

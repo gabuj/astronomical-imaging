@@ -1,6 +1,6 @@
 import numpy as np
 
-def takeout_baddata(data,baddata_coords):
+def takeout_baddata(data,baddata_coords,background_thershold):
     #get rid of bad data
     #define bad data
     bad_data = np.zeros_like(data, dtype=bool)
@@ -11,5 +11,5 @@ def takeout_baddata(data,baddata_coords):
         bad_data[y1:y2, x1:x2] = True
     #create mask for bad data
     good_data=np.copy(data)
-    good_data[bad_data==True]=0
+    good_data[bad_data==True]=background_thershold
     return good_data
