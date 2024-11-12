@@ -3,15 +3,25 @@ import matplotlib.pyplot as plt
 
 
 
-def add_galaxy(image_data, center_x, center_y, galaxy_peak, sigma):
+def gaussian(x, mu, sigma):
+    return np.exp(-np.power(x - mu, 2.) / (2 * np.power(sigma, 2.)))
+
+def sersic(x, I_e, r_e, n):
+    b_n = 1.9992 * n - 0.3271
+    return I_e * np.exp(-b_n * ((x / r_e)**(1/n) - 1))
+def add_galaxy(image_data, center_x, center_y, galaxy_peak, sigma,n):
     # Generate a Gaussian profile for the galaxy
     image_size=image_data.shape
     for x in range(image_size[0]):
         for y in range(image_size[1]):
             # Calculate distance from the center
+            
             distance = np.sqrt((x - center_x) ** 2 + (y - center_y) ** 2)
-            # Apply a Gaussian profile
-            image_data[x, y] += galaxy_peak * np.exp(-distance ** 2 / (2 * sigma ** 2))
+            # Apply a radial profile
+            if n==0:
+                image_data[x, y] += galaxy_peak * gaussian(distance, 0, sigma)
+            else:
+                image_data[x, y] += sersic(distance, galaxy_peak, sigma,n)
     return image_data
 
 def add_background_noise(image_data, noise_level, image_size,background_value):
@@ -22,13 +32,13 @@ def add_background_noise(image_data, noise_level, image_size,background_value):
     return image_data
 
 # Add the galaxies to the image
-def create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_value,noise_level):
+def create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_value,noise_level,ns):
     image_data = np.zeros(image_size)
     #add background noise
     image_data = add_background_noise(image_data, noise_level, image_size,background_value)
     #add galaxies
-    for center, galaxy_peak, sigma in zip(centers, galaxy_peaks, sigmas):
-        image_data = add_galaxy(image_data, center[0], center[1], galaxy_peak, sigma)
+    for center, galaxy_peak, sigma,n in zip(centers, galaxy_peaks, sigmas,ns):
+        image_data = add_galaxy(image_data, center[0], center[1], galaxy_peak, sigma,n)
     return image_data
 
 #parameters to create fake image:

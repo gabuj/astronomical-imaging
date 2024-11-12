@@ -9,19 +9,22 @@ import  takeout_bleeing
 import background_estimation
 #parameters to create fake image:
 image_size = (1028, 1028)  # Size of the image (512x512 pixels)
-centers = [(200, 200),(600, 600)]
-galaxy_peaks = [2000, 6000]
-sigmas = [4, 6]
+centers = [(200, 200),(400, 400),(600,600),(800,800)] # List of (y, x) coordinates of the centers of the galaxies
+galaxy_peaks = [2000, 6000, 10000, 15000] # List of peak intensities of the galaxies
+sigmas = [4, 6,10,4]  # List of standard deviations of the galaxies
+ns=[4,4,4,4] #List of n values for sersic profile
+ns= [0.5,0.5,0.5,0.5]
 noise_level = 20
 background_value= 100
 
+
 #create the data
-# data=creating_fake_image.create_fake_image(image_size, centers, galaxy_peaks, sigmas,background_value,noise_level)
+data=creating_fake_image.create_fake_image(image_size, centers, galaxy_peaks, sigmas,background_value,noise_level,ns)
 
 #without making the data each time can just import it
 distant2_data_path='fake_files/fake_image_2distantbright.npy'
 distant3_data_path='try_deblendingg/fake_image_2distantbright.npy'
-data=np.load(distant2_data_path)
+# data=np.load(distant2_data_path)
 
 original_data=np.copy(data)
 #parameters for the background estimation
@@ -155,6 +158,15 @@ for i in range(len(total_fluxes)):
     
     
     
+#if n all 0 then gaussian else sersic
+if all(n==0 for n in ns):
+    galaxy_expected_fluxes = [np.pi * peak * sigma**2 for peak, sigma in zip(galaxy_peaks, sigmas)]
+else:
+    galaxy_expected_fluxes = [flux_within_radius(galaxy_peak, sigma, n, 0, 0, 0)[0] for galaxy_peak, sigma, n in zip(galaxy_peaks, sigmas, ns)]
+    #sort by intensity
+    galaxy_expected_fluxes.sort()
+    
+print(f"the expected fluxes are {galaxy_expected_fluxes}")
     
     
 #CREATE CATALOG FILE
