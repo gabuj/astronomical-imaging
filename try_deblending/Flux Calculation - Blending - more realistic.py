@@ -1,14 +1,17 @@
 from astropy.io import fits
 import numpy as np
 from scipy.ndimage import gaussian_filter
+import os
 
 # Load the FITS file
-file_path = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/fake_image_1_realistic.fits"
+file_path = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/fake_image_2_small_realistic.fits"
 with fits.open(file_path) as hdul:
     image_data = hdul[0].data.copy()  # Copy of the 2D array of pixel values
 
 # Parameters
-background_threshold = 3481  # Consider anything less than 3481 as background
+background_level = 3000
+noise_level = 5
+background_threshold = background_level + 5 * noise_level # Consider anything less than 3481 as background
 output_image = image_data.copy()  # Image for marking centers and circles
 galaxy_count = 0  # Counter for detected galaxies
 
@@ -16,7 +19,7 @@ galaxy_count = 0  # Counter for detected galaxies
 while True:
     # Step 1: Find the highest pixel in the image (galaxy center)
     highest_pixel_value = image_data.max()
-    if highest_pixel_value < 3700:  # Stop if no significant peaks remain
+    if highest_pixel_value < 3080:  # Stop if no significant peaks remain
         break
 
     # Find the coordinates of the highest pixel in the image
@@ -53,8 +56,8 @@ while True:
         current_radius = i + 1
         radius_values = image_data[radii == current_radius]  # Extract pixel values at this radius
 
-        # Check blending condition: 70% of values below 2 and at least one value above 20
-        if np.sum(radius_values < background_threshold) >= 0.7 * len(radius_values) and np.any(radius_values > background_threshold + 1000):
+        # Check blending condition: 70% of values below threshold and at least one value above threshold + 1000
+        if np.sum(radius_values < background_threshold) >= 0.7 * len(radius_values) and np.any(radius_values > background_threshold + 10):
             blending_detected = True
             boundary_radius = i  # Mark the boundary for blending
             print(f"Blending detected for Galaxy {galaxy_count} at radius {boundary_radius}")
@@ -73,11 +76,13 @@ while True:
             current_radius = r + 1
             radius_values = image_data[radii == current_radius]  # Extract pixel values at this radius
             
-            # Stop expanding as soon as at least one pixel falls below background threshold
-            if np.any(radius_values < background_threshold):
-                threshold_radius = current_radius
-                print(f"Galaxy {galaxy_count} boundary detected at radius {threshold_radius}")
-                break
+            # Stop expanding as soon as at least 1 pixel is below background:
+            # if np.any(radius_values < background_threshold):
+            #     threshold_radius = current_radius
+            #     print(f"Galaxy {galaxy_count} boundary detected at radius {threshold_radius}")
+            #     break
+
+            #Other option is the average
 
         # Error handling if no boundary is found (unlikely if there is a background threshold)
         if threshold_radius is None:
@@ -100,9 +105,11 @@ while True:
 print(f"Total number of galaxies detected: {galaxy_count}")
 
 # Step 9: Save the modified data to a new FITS file with circles and centers marked
-output_path = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/fakeimage_results_realistic.fits"
+output_path = "fake_files/fakeimage_results_realistic.fits"
 hdu = fits.PrimaryHDU(output_image)
 hdul_with_circles = fits.HDUList([hdu])
 hdul_with_circles.writeto(output_path, overwrite=True)
 
 print(f"Final output saved to {output_path}")
+
+os.system(f"open {output_path}")
