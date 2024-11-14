@@ -11,15 +11,20 @@ with fits.open(file_path) as hdul:
 # Parameters
 background_level = 3000
 noise_level = 5
-background_threshold = background_level + 5 * noise_level # Consider anything less than 3481 as background
+std_multiplier = 5
+background_threshold = background_level + std_multiplier * noise_level # Consider anything less as background
 output_image = image_data.copy()  # Image for marking centers and circles
 galaxy_count = 0  # Counter for detected galaxies
+
+std_highest_pixel = 6
+
+std_threshold = background_level + std_highest_pixel * noise_level
 
 # Loop to detect galaxies until no significant peak remains
 while True:
     # Step 1: Find the highest pixel in the image (galaxy center)
     highest_pixel_value = image_data.max()
-    if highest_pixel_value < 3080:  # Stop if no significant peaks remain
+    if highest_pixel_value < std_threshold:  # Stop if no significant peaks remain
         break
 
     # Find the coordinates of the highest pixel in the image
@@ -82,7 +87,12 @@ while True:
             #     print(f"Galaxy {galaxy_count} boundary detected at radius {threshold_radius}")
             #     break
 
-            #Other option is the average
+            # Other option is the average
+            # Stop expanding as soon as the intensity falls below background threshold
+            if smoothed_profile[r] < background_threshold:
+                threshold_radius = r
+                print(f"Galaxy {galaxy_count} boundary detected at radius {threshold_radius}")
+                break
 
         # Error handling if no boundary is found (unlikely if there is a background threshold)
         if threshold_radius is None:
