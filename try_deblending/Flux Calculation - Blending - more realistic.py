@@ -5,7 +5,8 @@ import os
 
 # Load the FITS file
 name = "fakeimage_2_blending_realistic"
-file_path = f"/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/{name}.fits"
+name2 ="fakeimage_2_blending_small_big_realistic"
+file_path = f"/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/{name2}.fits"
 with fits.open(file_path) as hdul:
     image_data = hdul[0].data.copy()  # Copy of the 2D array of pixel values
 
@@ -98,7 +99,7 @@ while True:
     if blending_detected:
         # Start from radius 10 from the first galaxy's center
         min_radius = int(threshold_radius1 * 0.3)
-        max_radius = threshold_radius1  # Extend beyond the first galaxy's boundary
+        max_radius = threshold_radius1 + 200  # Extend beyond the first galaxy's boundary
         found_second_center = False
         for current_radius in range(min_radius, max_radius):
             # Get the indices of pixels at this radius
