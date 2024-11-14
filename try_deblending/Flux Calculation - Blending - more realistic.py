@@ -4,12 +4,13 @@ from scipy.ndimage import gaussian_filter
 import os
 
 # Load the FITS file
-file_path = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/fake_image_2_small_realistic.fits"
+name = "fakeimage_2_blending_realistic"
+file_path = f"/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/{name}.fits"
 with fits.open(file_path) as hdul:
     image_data = hdul[0].data.copy()  # Copy of the 2D array of pixel values
 
 # Parameters
-background_level = 3000
+background_level = 3415
 noise_level = 5
 std_multiplier = 5
 background_threshold = background_level + std_multiplier * noise_level # Consider anything less as background

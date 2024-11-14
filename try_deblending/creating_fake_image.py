@@ -40,20 +40,23 @@ def create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_leve
     return image_data
 
 # Parameters for creating images
-image_size = (1028, 1028)  # Size of the image
-centers = [(200, 200), (206, 206)]
-peaks = [200/2.7, 200/2.7]  # Base peak intensity for galaxy
-sigmas = [4, 4]  # Base sigma for galaxy spread
-ns = [0.5, 0.5]  # Sersic index for galaxy
+image_size = (1028, 1028)
+centers = [(500, 500), (508, 500)]  # Close centers to cause overlap
+peaks = [200, 200]
+sigmas = [4, 4]
+ns = [1.0, 1.0]
+
+
 noise_level = 5
-background_level = 3000
+background_level = 3415
 
 
 # Create the synthetic image
 image_data = create_fake_image(image_size, centers, peaks, sigmas, background_level, noise_level, ns)
 
 # Save each generated image as a FITS file
-output_path = "fake_files/fake_image_2_small_realistic.fits"
+name = "fakeimage_2_blending_realistic"
+output_path = f"fake_files/{name}.fits"
 hdu = fits.PrimaryHDU(image_data)
 hdul = fits.HDUList([hdu])
 hdul.writeto(output_path, overwrite=True)
@@ -61,6 +64,7 @@ print(f"File saved to {output_path}")
 
 # Automatically open the FITS file after creation
 os.system(f"open {output_path}")
+
 
 # Uncomment below if you'd like to view the last generated image
 # plt.imshow(image_data, cmap='gray')
