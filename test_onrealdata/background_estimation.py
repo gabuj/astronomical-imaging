@@ -8,6 +8,7 @@ def gaussian(x, a, std, m):
 
 def finding_background(data, fraction_bin, sigmas_thershold):
     num_bins = np.mean(data.shape)/fraction_bin
+    num_bins = 1000
     #only analyse the part of data close to max value when fitting the gaussian
     if num_bins>20*fraction_bin:
         near_max = int(num_bins/(200))
