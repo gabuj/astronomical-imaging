@@ -62,12 +62,7 @@ def finding_centers_radii(image_data,background_threshold,max_possible_radius,ov
                 boundary_radius = i  # Mark the boundary for blending
                 print(f"Blending detected for Galaxy {galaxy_count} at radius {boundary_radius}")
                 break
-            
-            # If we've reached a radius of 70 without detecting blending, exit and proceed with non-blending
-            elif current_radius >= 70:
-                blending_detected = False
-                print(f"No blending detected within radius 70 for Galaxy {galaxy_count}. Proceeding with non-blending case.")
-                break
+
 
         # If blending is not detected, determine the boundary based on background threshold
         if not blending_detected:

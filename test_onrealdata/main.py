@@ -19,8 +19,6 @@ hdulist = fits.open(path)
 
 data = hdulist[0].data
 
-#close file
-hdulist.close()
 
 #show initial image
 plt.imshow(data, cmap='gray', origin='lower')
@@ -35,6 +33,11 @@ sigmas_thershold = 5#how many sigmas of std after background is the threshold
 #find background
 background_thershold=background_estimation.finding_background(data, fraction_bin_totalbackground, sigmas_thershold) #problem!!
 background_thershold=3481
+
+#close file
+hdulist.close()
+
+
 #bleeding centerss
 bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776),(5,1430)] #list of (y, x) coordinates of the centers of the bleeding regions
 #take away bleeing
@@ -56,7 +59,7 @@ plt.show()
 
 
 #use only part of the data
-size=600
+size=300
 data=data[0:size,0:size]
 
 
