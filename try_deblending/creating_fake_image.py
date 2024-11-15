@@ -41,10 +41,10 @@ def create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_leve
 
 # Parameters for creating images
 image_size = (1028, 1028)
-centers = [(500, 500), (530, 500)]  # Corrected centers to match x and y
-peaks = [200, 150]
-sigmas = [20, 5]
-ns = [0.5, 0.5]
+centers = [(500, 500), (560, 500), (500, 560), (560, 560)]
+peaks = [180, 150, 150, 120]
+sigmas = [25, 20, 20, 15]
+ns = [0.5, 0.5, 0.5, 0.5]
 
 noise_level = 5
 background_level = 3415
@@ -53,7 +53,7 @@ background_level = 3415
 image_data = create_fake_image(image_size, centers, peaks, sigmas, background_level, noise_level, ns)
 
 # Save the generated image as a FITS file
-name = "fakeimage_2_blending_small_big_realistic_corrected"
+name = "4_cluster"
 output_path = f"fake_files/{name}.fits"
 hdu = fits.PrimaryHDU(image_data)
 hdul = fits.HDUList([hdu])

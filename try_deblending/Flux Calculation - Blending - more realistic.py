@@ -4,9 +4,24 @@ from scipy.ndimage import gaussian_filter
 import os
 
 # Load the FITS file
-name = "fakeimage_2_blending_realistic"
-name2 ="fakeimage_2_blending_small_big_realistic"
-file_path = f"/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/{name2}.fits"
+name1 = "1"
+name2 = "2_minimal_blending"
+name3 = "2_image_edge"
+name4 = "2_close_noblend"
+name5 = "2_similar"
+name6 = "1_extended_diffues"
+name7 = "4_cluster_60"
+file_path = f"/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/{name1}.fits"
+
+#Important tuning percentage parameters
+
+#Radius relative to hole radius in respect to the first centre where to start
+min_rad = 0.1
+
+#Relative intensity of second centre
+relative_int = 0.01
+
+
 with fits.open(file_path) as hdul:
     image_data = hdul[0].data.copy()  # Copy of the 2D array of pixel values
 
@@ -15,8 +30,9 @@ background_level = 3415
 noise_level = 5
 std_multiplier = 5
 background_threshold = background_level + std_multiplier * noise_level  # Consider anything less as background
-std_highest_pixel = 15
-std_threshold = background_level + std_highest_pixel * noise_level
+std_multiplier_highest_pixel = 30
+std_highest_pixel_threshold = background_level + std_multiplier_highest_pixel * noise_level
+
 
 output_image = image_data.copy()  # Image for marking centers and circles
 galaxy_count = 0  # Counter for detected galaxies
@@ -30,7 +46,7 @@ while True:
     # Ignore already processed pixels
     masked_image = np.where(processed_pixels, background_level, image_data)
     highest_pixel_value = masked_image.max()
-    if highest_pixel_value < std_threshold:  # Stop if no significant peaks remain
+    if highest_pixel_value < std_highest_pixel_threshold:  # Stop if no significant peaks remain
         break
 
     # Find the coordinates of the highest pixel in the masked image
@@ -67,7 +83,7 @@ while True:
 
         # Check blending condition
         if np.sum(radius_values < background_threshold) >= 0.7 * len(radius_values) and np.any(
-            radius_values > background_threshold + 10):
+            radius_values > background_threshold + 60):
             blending_detected = True
             boundary_radius1 = i  # Mark the boundary for blending
             print(f"Blending detected for Galaxy {galaxy_count} at radius {boundary_radius1}")
@@ -98,7 +114,7 @@ while True:
     # Step 6: If blending was detected, find the second galaxy before modifying the image
     if blending_detected:
         # Start from radius 10 from the first galaxy's center
-        min_radius = int(threshold_radius1 * 0.3)
+        min_radius = int(threshold_radius1 * min_rad)
         max_radius = threshold_radius1 + 200  # Extend beyond the first galaxy's boundary
         found_second_center = False
         for current_radius in range(min_radius, max_radius):
@@ -123,8 +139,8 @@ while True:
                     neighbors.append(image_data[y, x + 1])
                 # Check if the pixel value is greater than all its neighbors
                 if all(pixel_value > neighbor for neighbor in neighbors):
-                    # Check if pixel value is within 1% of the first center's value
-                    if abs(pixel_value - highest_pixel_value) <= 0.01 * highest_pixel_value:
+                    # Check if pixel value is within percentage of the first center's value
+                    if abs(pixel_value - highest_pixel_value) <= relative_int * highest_pixel_value:
                         # Found the second center
                         center_y2, center_x2 = y, x
                         second_peak_value = pixel_value
@@ -205,7 +221,7 @@ while True:
 print(f"\nTotal number of galaxies detected: {galaxy_count}")
 
 # Save the modified data to a new FITS file with circles and centers marked
-output_path = "fake_files/fakeimage_results_realistic.fits"
+output_path = "fake_files/output.fits"
 hdu = fits.PrimaryHDU(output_image)
 hdul_with_circles = fits.HDUList([hdu])
 hdul_with_circles.writeto(output_path, overwrite=True)
