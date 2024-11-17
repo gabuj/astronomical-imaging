@@ -11,7 +11,7 @@ name4 = "2_close_noblend"
 name5 = "2_similar"
 name6 = "1_extended_diffues"
 name7 = "4_cluster_60"
-file_path = f"/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/{name1}.fits"
+file_path = f'/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_file/{name1}.fits'
 
 #Important tuning percentage parameters
 

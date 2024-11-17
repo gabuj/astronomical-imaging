@@ -78,7 +78,7 @@ def finding_background(data, fraction_bin, sigmas_thershold):
     plt.show()
 
 
-    #set the threshold to 5 times the standard deviation of the gaussian meaning if the pixel intensity is greater than 5*std then it is a star
+    #set the threshold to 5 times the standard deviation of the gaussian meaning if the pixel intensity is greater than 5*std then it is a galaxy
     thresh = sigmas_thershold*popt[1]+popt[2]
     thersh_err =np.sqrt(np.diag(pcov)[1]*sigmas_thershold**2+np.diag(pcov)[2])
 
