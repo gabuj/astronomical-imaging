@@ -10,7 +10,6 @@ def gaussian(x, a, std, m):
 
 def finding_background(data, fraction_bin, sigmas_thershold):
     num_bins = np.mean(data.shape)/fraction_bin
-    num_bins = 11500
     #only analyse the part of data close to max value when fitting the gaussian
     if num_bins>20*fraction_bin:
         near_max = int(num_bins/(200))
@@ -146,4 +145,4 @@ def finding_local_background(data, fraction_bin, sigmas_thershold):
 path= '/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fits_file/mosaic.fits'
 hdulist = fits.open(path)
 data = hdulist[0].data
-finding_background(data, 1000000, 0)
+finding_background(data, 0.3, 5)
