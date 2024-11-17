@@ -5,7 +5,7 @@ import numpy as np
 import creating_fake_image
 import finding_center_radius
 import pandas as pd
-import  takeout_bleeing
+import takeout_bleeding
 import background_estimation
 import os
 from astropy.io import fits
