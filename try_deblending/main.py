@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
 import creating_fake_image
-import finding_center_radius
+import finding_center_radius2
 import pandas as pd
 import takeout_bleeding
 import background_estimation
@@ -16,8 +16,8 @@ galaxy_peaks = [2000, 6000, 10000, 15000] # List of peak intensities of the gala
 sigmas = [4, 6,10,4]  # List of standard deviations of the galaxies
 ns=[4,4,4,4] #List of n values for sersic profile
 ns= [0.5,0.5,0.5,0.5]
-noise_level = 20
-background_value= 100
+noise_level = 5
+background_value= 3415
 
 #finding radius paramters
 overexposed_threshold=65535
@@ -34,27 +34,21 @@ background_gain=3 #how many times more than radius is local background radius
 # data=np.load(data_LESSblended)
 
 # Option 2: Load data from .fits files
-distant2_data_path_fits = 'fake_files/fake_image_2distantbright.fits'
-distant3_data_path_fits = 'try_deblendingg/fake_image_2distantbright.fits'
-data_blended_fits = 'fake_files/fake_image_sersicblended_0505.fits'
-data_LESSblended_fits = 'fake_files/fake_image_sersicLESSblended_0505.fits'
-data_EVENLESSblended_fits = 'fake_files/fake_image_sersicEVENLESSblended_0505.fits'
+# distant2_data_path_fits = 'fake_files/fake_image_2distantbright.fits'
+# distant3_data_path_fits = 'try_deblendingg/fake_image_2distantbright.fits'
+# data_blended_fits = 'fake_files/fake_image_sersicblended_0505.fits'
+# data_LESSblended_fits = 'fake_files/fake_image_sersicLESSblended_0505.fits'
+# data_EVENLESSblended_fits = 'fake_files/fake_image_sersicEVENLESSblended_0505.fits'
 
-# List of FITS file paths
-fits_files = [
-    'fake_files/fake_image_1_galaxy.fits',
-]
 
-# Loop over each FITS file
-for file_path in fits_files:
-    # Extract a name identifier for each file (e.g., 'fake_image_2distantbright')
-    file_name = os.path.splitext(os.path.basename(file_path))[0]
 
-    # Load the FITS file
-    with fits.open(file_path) as hdul:
-        data = hdul[0].data.copy()  # Copy of the 2D array of pixel values
+file_path = '/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/1_extended_diffuses.fits'
 
-    original_data = np.copy(data)  # Keep a copy of the original data
+# Load the FITS file
+with fits.open(file_path) as hdul:
+    data = hdul[0].data.copy()  # Copy of the 2D array of pixel values
+
+original_data = np.copy(data)  # Keep a copy of the original data
 
 #parameters for the background estimation
 fraction_bin=4 #num bins is data shape/fraction_bin
@@ -84,10 +78,10 @@ background_thershold=background_value+5*noise_level
 #bleeding centerss
 bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776)] #list of (y, x) coordinates of the centers of the bleeding regions
 
-#show the image
-plt.imshow(data, cmap='gray')
-plt.colorbar()
-plt.show()
+# #show the image
+# plt.imshow(data, cmap='gray')
+# plt.colorbar()
+# plt.show()
 
 
 #take out the bleeding regions
@@ -95,8 +89,10 @@ plt.show()
 
 #still have to do: take out bad data
 
+centers_list,radii_list=finding_center_radius2.finding_centers_radii(data, background_thershold, max_radius, overexposed_threshold, file_path)
 
-centers_list,radii_list=finding_center_radius.finding_centers_radii(data,background_thershold,max_radius,overexposed_threshold)
+print(centers_list)
+print(radii_list)
 x, y = np.indices(data.shape)
 
 
@@ -191,10 +187,10 @@ for i, center in enumerate(centers_list):
     data_with_star_positions += galaxy_profile
     
 # Step 9: Save the modified data to a new FITS file with circles and centers marked
-output_path = "fake_files/fakeimage_results.fits"
-hdu = fits.PrimaryHDU(output_image)
-hdul_with_circles = fits.HDUList([hdu])
-hdul_with_circles.writeto(output_path, overwrite=True)
+# output_path = "fake_files/fakeimage_results.fits"
+# hdu = fits.PrimaryHDU(output_image)
+# hdul_with_circles = fits.HDUList([hdu])
+# hdul_with_circles.writeto(output_path, overwrite=True)
 
 # plot original image and created model image
 # plt.figure(figsize=(10, 5))

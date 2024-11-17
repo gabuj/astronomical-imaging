@@ -9,7 +9,7 @@ name2 = "2_minimal_blending"
 name3 = "2_image_edge"
 name4 = "2_close_noblend"
 name5 = "2_similar"
-name6 = "1_extended_diffues"
+name6 = "1_extended_diffuses"
 name7 = "4_cluster_60"
 file_path = f"/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/{name6}.fits"
 
