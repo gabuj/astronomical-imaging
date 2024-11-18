@@ -40,9 +40,33 @@ for i in range(num_bins):
         
 yerror = np.sqrt(counts)
 
-#how do i estimate magnitude error?
+#we want to plot logN(<m) vs m so counts are summed
+for i in range(len(counts)-1):
+    counts[i+1]=counts[i]+counts[i+1]
+    
+#add instrumental zero point found in fits file header as MAGZPT
+#open fits file
+from astropy.io import fits
+fits_file='fits_file/mosaic.fits'
+hdul = fits.open(fits_file)
+
+# Get the zero point from the FITS header
+zero_point = hdul[0].header['MAGZPT']
+zero_point_error = hdul[0].header['MAGZRR']
+
+# Close the FITS file
+hdul.close()
 # Calculate bin centers as the midpoint between each bin edge
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+
+
+#convert to magnitude
+bin_centers= -2.5 * np.log10(bin_centers) + zero_point
+magnitudes = -2.5 * np.log10(fluxes) + zero_point
+magnitude_errors = np.sqrt((2.5 / np.log(10) * fluxes_err / fluxes) ** 2 + zero_point_error ** 2)
+
+
+
 
 # Plot histogram of pixel intensities
 plt.figure(figsize=(10, 6))
