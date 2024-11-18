@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import creating_fake_image
 import finding_center_radius
-import finding_center_radius2
 import pandas as pd
 import background_estimation
 from astropy.io import fits

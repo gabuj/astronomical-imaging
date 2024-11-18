@@ -4,17 +4,17 @@
 <VOTABLE version="1.4" xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://www.ivoa.net/xml/VOTable/VOTable-1.4.xsd">
  <RESOURCE type="results">
   <TABLE>
-   <FIELD ID="x" datatype="long" name="x"/>
-   <FIELD ID="y" datatype="long" name="y"/>
+   <FIELD ID="x" datatype="int" name="x"/>
+   <FIELD ID="y" datatype="int" name="y"/>
    <FIELD ID="intensity" datatype="double" name="intensity"/>
    <FIELD ID="intensity_error" datatype="double" name="intensity error"/>
    <DATA>
     <TABLEDATA>
      <TR>
-      <TD>501</TD>
       <TD>499</TD>
-      <TD>1703115.200594946</TD>
-      <TD>2871.9421144852736</TD>
+      <TD>500</TD>
+      <TD>113671.78809663221</TD>
+      <TD>22725.66525698821</TD>
      </TR>
     </TABLEDATA>
    </DATA>
