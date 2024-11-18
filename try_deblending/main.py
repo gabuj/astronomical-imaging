@@ -2,8 +2,8 @@ from scipy.optimize import curve_fit
 import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
-import creating_fake_image
-import finding_center_radius
+# import creating_fake_image
+import finding_center_radius2
 import pandas as pd
 import  takeout_bleeding
 import background_estimation
@@ -13,9 +13,10 @@ import bad_data_clean
 max_localbackground_radius=200
 fraction_bin=max_localbackground_radius*2
 
+
 #open file
-path='fits_file/mosaic.fits'
-hdulist = fits.open(path)
+file_path='/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/1_extended_diffuses.fits'
+hdulist = fits.open(file_path)
 
 data = hdulist[0].data
 
@@ -31,17 +32,20 @@ plt.show()
 fraction_bin_totalbackground=3 #num bins is data shape/fraction_bin
 sigmas_thershold = 5#how many sigmas of std after background is the threshold
 #find background
-background_thershold=background_estimation.finding_background(data, fraction_bin_totalbackground, sigmas_thershold) #problem!!
-background_thershold=3481
+#background_thershold=background_estimation.finding_background(data, fraction_bin_totalbackground, sigmas_thershold)
+background_level = 3415
+noise_level = 5
+background_thershold= background_level + 5 * noise_level
 
+fraction_bin = 1
 #close file
 hdulist.close()
 
 
-#bleeding centerss
-bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776),(5,1430)] #list of (y, x) coordinates of the centers of the bleeding regions
+#bleeding centers, UNCOMMENT FOR REAL FILES
+#bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776),(5,1430)] #list of (y, x) coordinates of the centers of the bleeding regions
 #take away bleeing
-data=takeout_bleeding.takeou_bleeing(data,bleeding_centers,background_thershold)
+#data=takeout_bleeding.takeou_bleeing(data,bleeding_centers,background_thershold)
 
 #still have to do: take out bad data
 maxx=data.shape[1]
@@ -59,8 +63,8 @@ plt.show()
 
 
 #use only part of the data
-size=300
-data=data[0:size,0:size]
+# size=300
+# data=data[0:size,0:size]
 
 
 #finding radius paramters
@@ -71,7 +75,7 @@ background_gain=3 #how many times more than radius is local background radius
 
 
 
-original_data=np.copy(data)
+# original_data=np.copy(data)
 
 #paramters for finding centers and radius
 #set max radius being max distance from center to  edge of image    IMRPVOE THIS
@@ -81,18 +85,16 @@ backgroundfraction_tolerance=0.9
 
 
 #final files parameters
-vot_file = 'test_onrealdata/galaxy_catalog.vot'
-vot_highintensity_file = "test_onrealdata/highestintensity_galaxies.vot"
+vot_file = '/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/try_deblending/galaxy_catalog.vot'
+vot_highintensity_file = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/try_deblending/highestintensity_galaxies.vot"
 #transform df to cat file
-cat_file = 'test_onrealdata/galaxy_catalog.cat'
-cat_highintensity_file = "test_onrealdata/highestintensity_galaxies.cat"   
+cat_file = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/try_deblending/galaxy_catalog.cat"
+cat_highintensity_file = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/try_deblending/highestintensity_galaxies.cat"   
 
 
 
-
-centers_list,radii_list=finding_center_radius.finding_centers_radii(data,background_thershold,max_radius,overexposed_threshold)
+centers_list,radii_list=finding_center_radius2.finding_centers_radii(data, background_thershold, max_radius, overexposed_threshold, file_path)
 x, y = np.indices(data.shape)
-
 
 
 # Define the Sérsic profile
@@ -150,7 +152,7 @@ data_with_star_positions = np.zeros(data.shape)
 
 total_fluxes = []
 total_fluxes_err = []
-data=original_data
+# data=original_data
 flux_summed=0
 for i, center in enumerate(centers_list):
     
@@ -184,7 +186,7 @@ for i, center in enumerate(centers_list):
         continue
     
     
-    #to check if doinf correct job create own image with centers, raii and intensity found and see if same aas old image
+    #to check if doing correct job create own image with centers, raii and intensity found and see if same aas old image
     galaxy_profile = sersic_profile(r, I_e, r_e, n)
     #add the galaxy profile around its center
     data_with_star_positions += galaxy_profile
