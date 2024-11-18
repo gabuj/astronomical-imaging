@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import creating_fake_image
 import finding_center_radius
+import finding_center_radius2
 import pandas as pd
 import background_estimation
 from astropy.io import fits
@@ -17,7 +18,7 @@ fraction_bin=max_localbackground_radius*2
 # Parameters for creating images
 image_size = (1028, 1028)
 centers = [(500, 500)]
-peaks = [180]
+peaks = [20]
 sigmas = [25]
 ns = [0.5]
 
@@ -25,10 +26,6 @@ noise_level = 5
 background_level = 3415
 
 data=creating_fake_image.create_fake_image(image_size, centers, peaks, sigmas,background_level,noise_level,ns)
-
-#open file
-file_path='fake_files/1_extended_diffuses.fits'
-hdulist = fits.open(file_path)
 
 
 #show initial image
@@ -47,10 +44,9 @@ background_level = 3415
 noise_level = 5
 background_thershold= background_level + 5 * noise_level
 
-# fraction_bin = 1
-#close file
-hdulist.close()
+background_std=noise_level
 
+# fraction_bin = 1
 
 #bleeding centers, UNCOMMENT FOR REAL FILES
 #bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776),(5,1430)] #list of (y, x) coordinates of the centers of the bleeding regions
@@ -58,10 +54,10 @@ hdulist.close()
 #data=takeout_bleeding.takeou_bleeing(data,bleeding_centers,background_thershold)
 
 #still have to do: take out bad data
-maxx=data.shape[1]
-maxy=data.shape[0]
-baddata_coords=[[0,0,33,430],[0,0,124,119],[0,0,105,408],[0,2462,126,maxx],[0,0,408,99],[0,0,430,26],[0,0,4518,4],[4516,0,maxy,120],[4504,2161,maxy,maxx],[0,2467,maxy,maxx]] #top left and top right corner of region (y1,x1,y2,x2)
-data=bad_data_clean.takeout_baddata(data,baddata_coords,background_thershold)
+# maxx=data.shape[1]
+# maxy=data.shape[0]
+# baddata_coords=[[0,0,33,430],[0,0,124,119],[0,0,105,408],[0,2462,126,maxx],[0,0,408,99],[0,0,430,26],[0,0,4518,4],[4516,0,maxy,120],[4504,2161,maxy,maxx],[0,2467,maxy,maxx]] #top left and top right corner of region (y1,x1,y2,x2)
+# data=bad_data_clean.takeout_baddata(data,baddata_coords,background_thershold)
 
 
 #show cleaned image
@@ -88,7 +84,7 @@ background_gain=3 #how many times more than radius is local background radius
 # original_data=np.copy(data)
 
 #paramters for finding centers and radius
-#set max radius being max distance from center to  edge of image    IMRPVOE THIS
+#set max radius being max distance from center to  edge of image    IMPROVE THIS
 max_radius=int(np.sqrt(data.shape[0]**2+data.shape[1]**2)/4)
 backgroundfraction_tolerance=0.9
 
@@ -103,7 +99,13 @@ cat_highintensity_file = "LAST_PUTTINGSTUFFTOGETHER/highestintensity_galaxies.ca
 
 
 
-centers_list,radii_list=finding_center_radius.finding_centers_radii(data, background_thershold, max_radius, overexposed_threshold, file_path)
+centers_list,radii_list=finding_center_radius.finding_centers_radii(data, max_radius, overexposed_threshold,background_level,background_std)
+print(f"centers are {centers_list}")
+
+# file_path="fj"
+# centers_list,radii_list=finding_center_radius2.finding_centers_radii(data, background_level, max_radius, overexposed_threshold, file_path)
+
+
 x, y = np.indices(data.shape)
 
 
@@ -204,6 +206,12 @@ for i, center in enumerate(centers_list):
     #add the galaxy profile around its center
     data_with_star_positions += galaxy_profile
     
+#add circle around the center of the galaxy to see if found radius is correct
+for center, radius in zip(centers_list, radii_list):
+    y_center, x_center = center
+    r = np.sqrt((x - x_center)**2 + (y - y_center)**2)
+    r = r.astype(int)
+    data[r == radius] = np.max(data)
 # plot original image and created model image
 plt.figure(figsize=(10, 5))
 plt.subplot(1, 2, 1)
@@ -222,7 +230,7 @@ print(f"percentage of fluxes that could not be fitted: {flux_summed/len(centers_
 #print expected fluxes
 for i in range(len(peaks)):
     expectred_flux=flux_within_radius(peaks[i], sigmas[i], ns[i], 0, 0, 0)[0]
-    print(f"Expected flux for galaxy {i + 1}: {peaks[i]:.2e}")
+    print(f"Expected flux for galaxy {i + 1}: {expectred_flux:.2e}")
     
 #CREATE CATALOG FILE
 #how many largest galaxy do you want to see?
