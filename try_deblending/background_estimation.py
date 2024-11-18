@@ -148,7 +148,7 @@ def finding_local_background(data, fraction_bin, sigmas_thershold):
 
     return thresh
 
-path= '/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/1_extended_diffuses.fits'
-hdulist = fits.open(path)
-data = hdulist[0].data
-finding_background(data, 0.3, 5)
+# path= '/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/1_extended_diffuses.fits'
+# hdulist = fits.open(path)
+# data = hdulist[0].data
+# finding_background(data, 0.3, 5)

@@ -9,7 +9,7 @@ import  takeout_bleeding
 import background_estimation
 from astropy.io import fits
 import bad_data_clean
-#gete data
+#get data
 max_localbackground_radius=200
 fraction_bin=max_localbackground_radius*2
 
@@ -37,7 +37,7 @@ background_level = 3415
 noise_level = 5
 background_thershold= background_level + 5 * noise_level
 
-fraction_bin = 1
+# fraction_bin = 1
 #close file
 hdulist.close()
 
@@ -107,8 +107,9 @@ def radial_profile(data, max_radius, r):
     # Step 3: Calculate the radial intensity profile by averaging pixel values at each radius
     radial_distances=np.arange(1,max_radius+1)
     radial_intensity = np.array([data[r == rad].mean() if np.any(r == r) else 0 for rad in radial_distances])
-    print(f"radial distances are {radial_distances}")
-    print(f"radial intensities are {radial_intensity}")
+    #the following 2 lines not necessary
+    #print(f"radial distances are {radial_distances}")
+    #print(f"radial intensities are {radial_intensity}")
     return radial_distances, radial_intensity
 
 # Fit the Sérsic profile to the radial data
@@ -121,9 +122,9 @@ def fit_sersic(data, x_center, y_center, max_radius, r):
     popt, covt = curve_fit(sersic_profile, radii, intensities, p0=[I_e_guess, r_e_guess, n_guess])
     I_e, r_e, n = popt
     I_e_err, r_e_err, n_err = np.sqrt(np.diag(covt))
-    print(f"I_e: {I_e} +/- {I_e_err}")
-    print(f"r_e: {r_e} +/- {r_e_err}")
-    print(f"n: {n} +/- {n_err}")
+    print(f"I_e: {I_e:.2e} +/- {I_e_err:.2e} W/m^2")
+    print(f"r_e: {r_e:.2e} +/- {r_e_err:.2e} m")
+    print(f"n: {n:.2e} +/- {n_err:.2e}")
     return I_e, r_e, n, I_e_err, r_e_err, n_err
 
 def flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err):
@@ -202,7 +203,7 @@ plt.title('Model Image')
 plt.show()
 
 for i in range(len(total_fluxes)):
-    print(f"Total flux for galaxy {i + 1}: {total_fluxes[i]} +/- {total_fluxes_err[i]}")
+    print(f"Total flux for galaxy {i + 1}: {total_fluxes[i]:.2e} +/- {total_fluxes_err[i]:.2e}")
     
 print(f"percentage of fluxes that could not be fitted: {flux_summed/len(centers_list)*100}%")
     
