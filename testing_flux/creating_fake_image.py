@@ -49,14 +49,14 @@ ns = [0.5, 0.5, 0.5]
 noise_level = 5
 background_level = 3415
 
-# Create the synthetic image
-image_data = create_fake_image(image_size, centers, peaks, sigmas, background_level, noise_level, ns)
+# # Create the synthetic image
+# image_data = create_fake_image(image_size, centers, peaks, sigmas, background_level, noise_level, ns)
 
-# Save the generated image as a FITS file
-name = "3_cluster"
-output_path = f"fake_files/{name}.npy"
-np.save(output_path, image_data)
-print(f"File saved to {output_path}")
+# # Save the generated image as a FITS file
+# name = "3_cluster"
+# output_path = f"fake_files/{name}.npy"
+# np.save(output_path, image_data)
+# print(f"File saved to {output_path}")
 
 # Uncomment below if you'd like to view the last generated image
 # plt.imshow(image_data, cmap='gray')

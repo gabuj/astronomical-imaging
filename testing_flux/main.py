@@ -13,7 +13,18 @@ max_localbackground_radius=200
 fraction_bin=max_localbackground_radius*2
 
 
-data=creating_fake_image
+#creating fake image data
+# Parameters for creating images
+image_size = (1028, 1028)
+centers = [(500, 500)]
+peaks = [180]
+sigmas = [25]
+ns = [0.5]
+
+noise_level = 5
+background_level = 3415
+
+data=creating_fake_image.create_fake_image(image_size, centers, peaks, sigmas,background_level,noise_level,ns)
 
 #open file
 file_path='fake_files/1_extended_diffuses.fits'
@@ -149,7 +160,8 @@ def take_away_localbackground(data,radius,r,background_gain):
     return local_background,local_background_err
 #create data with bakcground=0 and star positions with their intensity
 data_with_star_positions = np.zeros(data.shape)
-data_with_star_positions += background_level
+noise=noise = np.random.normal(background_level, noise_level, image_size)
+data_with_star_positions += noise
 
 total_fluxes = []
 total_fluxes_err = []
@@ -207,6 +219,10 @@ for i in range(len(total_fluxes)):
     
 print(f"percentage of fluxes that could not be fitted: {flux_summed/len(centers_list)*100}%")
     
+#print expected fluxes
+for i in range(len(peaks)):
+    expectred_flux=flux_within_radius(peaks[i], sigmas[i], ns[i], 0, 0, 0)[0]
+    print(f"Expected flux for galaxy {i + 1}: {peaks[i]:.2e}")
     
 #CREATE CATALOG FILE
 #how many largest galaxy do you want to see?
