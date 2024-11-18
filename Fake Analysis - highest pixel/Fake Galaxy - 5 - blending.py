@@ -57,7 +57,7 @@ image_data += noise
 image_data = np.clip(image_data, 0, None)
 
 # Save the resulting image as a FITS file
-output_path = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Astro/Fits_Data/fakeimage - 5 - blending.fits"
+output_path = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/fakeimage_5_blending.fits"
 hdu = fits.PrimaryHDU(image_data)
 hdul = fits.HDUList([hdu])
 hdul.writeto(output_path, overwrite=True)
