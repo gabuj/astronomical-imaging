@@ -37,7 +37,7 @@ def finding_background(data, fraction_bin, sigmas_thershold):
     max_index = np.where(counts == max_value) 
     max_index = max_index[0][0]
     x_max = bin_centers[max_index]
-    print(f"Max value: {max_value} at {x_max}")
+    # print(f"Max value: {max_value} at {x_max}")
     
     min_near = max_index-near_max if max_index-near_max>0 else 0
     max_near = max_index+near_max if max_index+near_max<num_bins else num_bins
