@@ -84,7 +84,7 @@ backgroundfraction_tolerance=0.9
 
 
 
-#final files parameters
+    #final files parameters
 vot_file = '/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/try_deblending/galaxy_catalog.vot'
 vot_highintensity_file = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/try_deblending/highestintensity_galaxies.vot"
 #transform df to cat file
@@ -150,6 +150,7 @@ def take_away_localbackground(data,radius,r,background_gain):
     return local_background,local_background_err
 #create data with bakcground=0 and star positions with their intensity
 data_with_star_positions = np.zeros(data.shape)
+data_with_star_positions += background_level
 
 total_fluxes = []
 total_fluxes_err = []
@@ -168,19 +169,19 @@ for i, center in enumerate(centers_list):
    
    
     try:
-        I_e, r_e, n, I_e_err, r_e_err, n_err = fit_sersic(data, x_center, y_center, radius, r)
+        temporary_data=np.copy(data)
+        temporary_data-=local_background
+        I_e, r_e, n, I_e_err, r_e_err, n_err = fit_sersic(temporary_data, x_center, y_center, radius, r)
         flux=flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[0]
         flux_err=flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[1]
-        flux=flux-local_background
-        
         total_fluxes.append(flux)
         total_fluxes_err.append(flux_err)
     except RuntimeError:
         print(f"Could not fit Sérsic profile for galaxy {i + 1}")
         #fit in another way
-        flux=otherway_flux_within_radius(data, x_center, y_center, radius, r)[0]
-        flux_err=otherway_flux_within_radius(data, x_center, y_center, radius, r)[1]
-        
+        temporary_data=np.copy(data)
+        temporary_data-=local_background
+        flux,flux_err=otherway_flux_within_radius(temporary_data, x_center, y_center, radius, r)
         total_fluxes.append(flux)
         total_fluxes_err.append(flux_err)
         flux_summed+=1
