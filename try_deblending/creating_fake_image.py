@@ -40,28 +40,28 @@ def create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_leve
     return image_data
 
 # Parameters for creating images
-image_size = (1028, 1028)
-centers = [(500, 500), (560, 500), (500, 560)]
-peaks = [180, 150, 150]
-sigmas = [25, 20, 20]
-ns = [0.5, 0.5, 0.5]
+# image_size = (1028, 1028)
+# centers = [(500, 500), (560, 500), (500, 560)]
+# peaks = [180, 150, 150]
+# sigmas = [25, 20, 20]
+# ns = [0.5, 0.5, 0.5]
 
-noise_level = 5
-background_level = 3415
+# noise_level = 5
+# background_level = 3415
 
 # Create the synthetic image
-image_data = create_fake_image(image_size, centers, peaks, sigmas, background_level, noise_level, ns)
+# image_data = create_fake_image(image_size, centers, peaks, sigmas, background_level, noise_level, ns)
 
 # Save the generated image as a FITS file
-name = "3_cluster"
-output_path = f"/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/{name}.fits"
-hdu = fits.PrimaryHDU(image_data)
-hdul = fits.HDUList([hdu])
-hdul.writeto(output_path, overwrite=True)
-print(f"File saved to {output_path}")
+# name = "3_cluster"
+# output_path = f"/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/{name}.fits"
+# hdu = fits.PrimaryHDU(image_data)
+# hdul = fits.HDUList([hdu])
+# hdul.writeto(output_path, overwrite=True)
+# print(f"File saved to {output_path}")
 
 # Automatically open the FITS file after creation
-os.system(f"open {output_path}")
+# os.system(f"open {output_path}")
 
 # Uncomment below if you'd like to view the last generated image
 # plt.imshow(image_data, cmap='gray')

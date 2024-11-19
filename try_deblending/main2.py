@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
 #import creating_fake_image
-import finding_center_radius2
+import try_deblending.finding_center_radius as finding_center_radius
 import pandas as pd
 import takeout_bleeding
 import background_estimation
@@ -89,7 +89,7 @@ bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776)] #list of (y, x
 
 #still have to do: take out bad data
 
-centers_list,radii_list=finding_center_radius2.finding_centers_radii(data, background_thershold, max_radius, overexposed_threshold, file_path)
+centers_list,radii_list=finding_center_radius.finding_centers_radii(data, background_thershold, max_radius, overexposed_threshold, file_path)
 
 print(centers_list)
 print(radii_list)
