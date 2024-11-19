@@ -1,10 +1,14 @@
-
 import matplotlib.pyplot as plt
 import numpy as np
 
 #data is contained in cat file
-filename='C:/SAOImageDS9/my_project_outputs/test_onrealdata/size_1200/galaxy_catalog.cat'
-fluxes,fluxes_err = np.loadtxt(filename, delimiter=' ', skiprows=1,usecols=(2,3), unpack=True)
+filename = "C:/SAOImageDS9/my_project_outputs/test_onrealdata/size_1000/galaxy_catalog.cat"
+fluxes, fluxes_err = np.loadtxt(filename, delimiter=' ', skiprows=1, usecols=(2,3), unpack=True)
+# Create a mask to filter out rows with invalid values (NaN or inf) in fluxes or fluxes_err
+valid_indices = ~np.isnan(fluxes) & ~np.isnan(fluxes_err) & ~np.isinf(fluxes) & ~np.isinf(fluxes_err)
+# Apply the mask to both fluxes and fluxes_err
+fluxes = fluxes[valid_indices]
+fluxes_err = fluxes_err[valid_indices]
 galaxy_nuber=len(fluxes)
 print(f"number of galaxies: {galaxy_nuber}")
 
@@ -28,7 +32,7 @@ magnitude_err = 2.5/np.log(10)*fluxes_err/fluxes
 
 #convert to real magnitude
 magnitudes = magnitude + zero_point
-magnitude_errors = np.sqrt(magnitude_err**2 + zero_point_error**2)
+magnitude_errors = np.sqrt(magnitude_err*2 + zero_point_error*2)
 
 
 
@@ -109,7 +113,7 @@ plt.show()
 
 #fit only first part of the plot now
 # Define the range of the data to fit
-range=20
+range=10
 fit_bright_range = bin_centers < range
 fit_faint_range= bin_centers >= range
 
