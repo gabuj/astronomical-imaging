@@ -2,21 +2,23 @@ from scipy.optimize import curve_fit
 import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
-# import creating_fake_image
-import finding_center_radius2
+import creating_fake_image
+import finding_center_radius
 import pandas as pd
 import  takeout_bleeding
 import background_estimation
 from astropy.io import fits
 import bad_data_clean
-#get data
+#gete data
 max_localbackground_radius=200
 fraction_bin=max_localbackground_radius*2
+background_gain=3 #how many times more than radius is local background radius
+
 
 
 #open file
-file_path='/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/1_extended_diffuses.fits'
-hdulist = fits.open(file_path)
+path='fits_file/mosaic.fits'
+hdulist = fits.open(path)
 
 data = hdulist[0].data
 
@@ -29,29 +31,26 @@ plt.show()
 
 
 #parameters for the background estimation
-fraction_bin_totalbackground=3 #num bins is data shape/fraction_bin
+fraction_bin_totalbackground=1.1 #num bins is data shape/fraction_bin
 sigmas_thershold = 5#how many sigmas of std after background is the threshold
 #find background
-#background_thershold=background_estimation.finding_background(data, fraction_bin_totalbackground, sigmas_thershold)
-background_level = 3415
-noise_level = 5
-background_thershold= background_level + 5 * noise_level
+background_value,background_std=background_estimation.finding_background(data, fraction_bin_totalbackground, sigmas_thershold) #problem!!
+background_thershold=background_value+sigmas_thershold*background_std
 
-# fraction_bin = 1
 #close file
 hdulist.close()
 
 
-#bleeding centers, UNCOMMENT FOR REAL FILES
-#bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776),(5,1430)] #list of (y, x) coordinates of the centers of the bleeding regions
+#bleeding centerss
+bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776),(5,1430)] #list of (y, x) coordinates of the centers of the bleeding regions
 #take away bleeing
-#data=takeout_bleeding.takeou_bleeing(data,bleeding_centers,background_thershold)
+data=takeout_bleeding.takeou_bleeing(data,bleeding_centers,background_thershold,background_value)
 
 #still have to do: take out bad data
 maxx=data.shape[1]
 maxy=data.shape[0]
 baddata_coords=[[0,0,33,430],[0,0,124,119],[0,0,105,408],[0,2462,126,maxx],[0,0,408,99],[0,0,430,26],[0,0,4518,4],[4516,0,maxy,120],[4504,2161,maxy,maxx],[0,2467,maxy,maxx]] #top left and top right corner of region (y1,x1,y2,x2)
-data=bad_data_clean.takeout_baddata(data,baddata_coords,background_thershold)
+data=bad_data_clean.takeout_baddata(data,baddata_coords,background_value)
 
 
 #show cleaned image
@@ -63,19 +62,18 @@ plt.show()
 
 
 #use only part of the data
-# size=300
-# data=data[0:size,0:size]
+size=300
+data=data[0:size,0:size]
 
 
 #finding radius paramters
 overexposed_threshold=65535
-background_gain=3 #how many times more than radius is local background radius
 #create the data
 # data=creating_fake_image.create_fake_image(image_size, centers, galaxy_peaks, sigmas,background_value,noise_level,ns)
 
 
 
-# original_data=np.copy(data)
+original_data=np.copy(data)
 
 #paramters for finding centers and radius
 #set max radius being max distance from center to  edge of image    IMRPVOE THIS
@@ -85,16 +83,18 @@ backgroundfraction_tolerance=0.9
 
 
 #final files parameters
-vot_file = '/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/try_deblending/galaxy_catalog.vot'
-vot_highintensity_file = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/try_deblending/highestintensity_galaxies.vot"
+vot_file = 'test_onrealdata/galaxy_catalog.vot'
+vot_highintensity_file = "test_onrealdata/highestintensity_galaxies.vot"
 #transform df to cat file
-cat_file = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/try_deblending/galaxy_catalog.cat"
-cat_highintensity_file = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/try_deblending/highestintensity_galaxies.cat"   
+cat_file = 'test_onrealdata/galaxy_catalog.cat'
+cat_highintensity_file = "test_onrealdata/highestintensity_galaxies.cat"   
 
 
 
-centers_list,radii_list=finding_center_radius2.finding_centers_radii(data, background_thershold, max_radius, overexposed_threshold, file_path)
+
+centers_list,radii_list=finding_center_radius.finding_centers_radii(data,overexposed_threshold,background_value,background_std,background_gain)
 x, y = np.indices(data.shape)
+
 
 
 # Define the Sérsic profile
@@ -107,13 +107,12 @@ def radial_profile(data, max_radius, r):
     # Step 3: Calculate the radial intensity profile by averaging pixel values at each radius
     radial_distances=np.arange(1,max_radius+1)
     radial_intensity = np.array([data[r == rad].mean() if np.any(r == r) else 0 for rad in radial_distances])
-    #the following 2 lines not necessary
-    #print(f"radial distances are {radial_distances}")
-    #print(f"radial intensities are {radial_intensity}")
+    print(f"radial distances are {radial_distances}")
+    print(f"radial intensities are {radial_intensity}")
     return radial_distances, radial_intensity
 
 # Fit the Sérsic profile to the radial data
-def fit_sersic(data, x_center, y_center, max_radius, r):
+def fit_sersic(data, max_radius, r):
     print(f"max radius is {max_radius}")
     radii, intensities = radial_profile(data, max_radius, r)
     I_e_guess = np.max(intensities)
@@ -122,9 +121,9 @@ def fit_sersic(data, x_center, y_center, max_radius, r):
     popt, covt = curve_fit(sersic_profile, radii, intensities, p0=[I_e_guess, r_e_guess, n_guess])
     I_e, r_e, n = popt
     I_e_err, r_e_err, n_err = np.sqrt(np.diag(covt))
-    print(f"I_e: {I_e:.2e} +/- {I_e_err:.2e} W/m^2")
-    print(f"r_e: {r_e:.2e} +/- {r_e_err:.2e} m")
-    print(f"n: {n:.2e} +/- {n_err:.2e}")
+    print(f"I_e: {I_e} +/- {I_e_err}")
+    print(f"r_e: {r_e} +/- {r_e_err}")
+    print(f"n: {n} +/- {n_err}")
     return I_e, r_e, n, I_e_err, r_e_err, n_err
 
 def flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err):
@@ -135,7 +134,7 @@ def flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err):
     return total_flux, total_flux_err
 
 
-def otherway_flux_within_radius(data, x_center, y_center, max_radius, r):
+def otherway_flux_within_radius(data, max_radius, r):
     radii, intensities = radial_profile(data, max_radius, r)
     total_flux = np.sum(intensities)
     total_flux_err = np.sqrt(np.sum(intensities)) #not correct but don't know how to do it
@@ -150,10 +149,11 @@ def take_away_localbackground(data,radius,r,background_gain):
     return local_background,local_background_err
 #create data with bakcground=0 and star positions with their intensity
 data_with_star_positions = np.zeros(data.shape)
+data_with_star_positions += background_value
 
 total_fluxes = []
 total_fluxes_err = []
-# data=original_data
+data=original_data
 flux_summed=0
 for i, center in enumerate(centers_list):
     
@@ -165,12 +165,14 @@ for i, center in enumerate(centers_list):
     
      #take away local background value from intensity
     local_background,local_background_err=take_away_localbackground(data,radius,r,background_gain)
-   
+    temporary_data=np.copy(data)
+    #make loacl background same kind of array as data
+    local_background=np.full(data.shape,local_background)
+    temporary_data-=local_background
    
     try:
-        I_e, r_e, n, I_e_err, r_e_err, n_err = fit_sersic(data, x_center, y_center, radius, r)
-        flux=flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[0]
-        flux_err=flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[1]
+        I_e, r_e, n, I_e_err, r_e_err, n_err = fit_sersic(temporary_data, radius, r)
+        flux, flux_err = flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)
         flux=flux-local_background
         
         total_fluxes.append(flux)
@@ -178,16 +180,14 @@ for i, center in enumerate(centers_list):
     except RuntimeError:
         print(f"Could not fit Sérsic profile for galaxy {i + 1}")
         #fit in another way
-        flux=otherway_flux_within_radius(data, x_center, y_center, radius, r)[0]
-        flux_err=otherway_flux_within_radius(data, x_center, y_center, radius, r)[1]
-        
+        flux,flux_err=otherway_flux_within_radius(temporary_data, radius, r)
         total_fluxes.append(flux)
         total_fluxes_err.append(flux_err)
         flux_summed+=1
         continue
     
     
-    #to check if doing correct job create own image with centers, raii and intensity found and see if same aas old image
+    #to check if doinf correct job create own image with centers, raii and intensity found and see if same aas old image
     galaxy_profile = sersic_profile(r, I_e, r_e, n)
     #add the galaxy profile around its center
     data_with_star_positions += galaxy_profile
@@ -203,7 +203,7 @@ plt.title('Model Image')
 plt.show()
 
 for i in range(len(total_fluxes)):
-    print(f"Total flux for galaxy {i + 1}: {total_fluxes[i]:.2e} +/- {total_fluxes_err[i]:.2e}")
+    print(f"Total flux for galaxy {i + 1}: {total_fluxes[i]} +/- {total_fluxes_err[i]}")
     
 print(f"percentage of fluxes that could not be fitted: {flux_summed/len(centers_list)*100}%")
     

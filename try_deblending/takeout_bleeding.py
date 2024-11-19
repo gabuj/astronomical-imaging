@@ -29,3 +29,6 @@ def takeou_bleeing(data,bleeding_centers,threshold):
     return galaxy_mask
 
     #galaxy_mask is data without the bleeding regions
+
+
+
