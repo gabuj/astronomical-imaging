@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 #data is contained in cat file
-filename='test_onrealdata/galaxy_catalog.cat'
+filename='C:/SAOImageDS9/my_project_outputs/test_onrealdata/size_1200/galaxy_catalog.cat'
 fluxes,fluxes_err = np.loadtxt(filename, delimiter=' ', skiprows=1,usecols=(2,3), unpack=True)
 galaxy_nuber=len(fluxes)
 print(f"number of galaxies: {galaxy_nuber}")

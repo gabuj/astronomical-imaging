@@ -63,7 +63,7 @@ plt.show()
 
 
 #use only part of the data
-size=600
+size=1200
 data=data[0:size,0:size]
 
 #finding radius paramters
