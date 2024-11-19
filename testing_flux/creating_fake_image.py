@@ -37,7 +37,7 @@ def create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_leve
     image_data = add_background_noise(image_data, noise_level, image_size, background_level)
     for center, galaxy_peak, sigma, n in zip(centers, galaxy_peaks, sigmas, ns):
         image_data = add_galaxy(image_data, center[0], center[1], galaxy_peak, sigma, n)
-        print(f"Added galaxy at {center} with peak {galaxy_peak}, sigma {sigma}, and n {n}")
+        # print(f"Added galaxy at {center} with peak {galaxy_peak}, sigma {sigma}, and n {n}")
     return image_data
 
 # # Parameters for creating images

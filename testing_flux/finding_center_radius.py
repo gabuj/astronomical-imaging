@@ -76,7 +76,7 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
                  radii_mask = np.sqrt((x_indices_mask - mask_centerx) ** 2 + (y_indices_mask - mask_centery) ** 2)
                  radii_mask = radii_mask.astype(int)
                     # Masking the galaxy region
-                 image_data[radii_mask <= mask_radius] = background_threshold - 1  # Set to background - 1
+                #  image_data[radii_mask <= mask_radius] = background_level  # Set to background
                  processed_pixels[radii_mask <= mask_radius] = True  # Ensure these pixels are not reprocessed
                  break
              center_x1, center_y1 = center_of_mass(binary_mask, labels, galaxy_label)      
@@ -152,7 +152,7 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
             # Proceed to detect the second galaxy
             masked_galaxies.append((center_y1, center_x1, threshold_radius1))
             #append to detected_galaxies if radius is greater than minimum radius and not overexposed
-            if threshold_radius1 >= minimum_radius and image_data[center_y1, center_x1] <= overexposed_threshold:
+            if threshold_radius1 >= minimum_radius and image_data[center_y1, center_x1] < overexposed_threshold:
                 detected_galaxies.append((center_y1, center_x1, threshold_radius1))
             
             # Append to centers_list and radii_list
@@ -219,7 +219,7 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
                                 print(f"not found radius of second blended galaxy")
                             masked_galaxies.append((center_y2, center_x2, threshold_radius2))
                             #append to detected_galaxies if radius is greater than minimum radius and not overexposed
-                            if threshold_radius2 >= minimum_radius and image_data[center_y2, center_x2] <= overexposed_threshold:
+                            if threshold_radius2 >= minimum_radius and image_data[center_y2, center_x2] < overexposed_threshold:
                                 detected_galaxies.append((center_y2, center_x2, threshold_radius2))
                                 
                             
@@ -239,14 +239,14 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
                 circle_mask1 = (radii1 >= threshold_radius1 - 1) & (radii1 <= threshold_radius1 + 1)
                 output_image[circle_mask1] = output_image.max()  # Boundary in white
                 # Mark the center of the first galaxy in black
-                output_image[center_y1, center_x1] = image_data.min()
+                output_image[center_y1, center_x1] = background_level
                 # Mark pixels as processed for the first galaxy
                 processed_pixels[radii1 <= threshold_radius1] = True
         else:
         
             masked_galaxies.append((center_y1, center_x1, not_blended_radius))
             #append to detected_galaxies if radius is greater than minimum radius and not overexposed
-            if not_blended_radius >= minimum_radius and image_data[center_y1, center_x1] <= overexposed_threshold:
+            if not_blended_radius >= minimum_radius and image_data[center_y1, center_x1] < overexposed_threshold:
                 detected_galaxies.append((center_y1, center_x1, not_blended_radius))
                 
             
@@ -264,7 +264,7 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
             radii_mask = np.sqrt((x_indices_mask - center_x) ** 2 + (y_indices_mask - center_y) ** 2)
             radii_mask = radii_mask.astype(int)
             # Masking the galaxy region
-            image_data[radii_mask <= mask_radius] = background_threshold - 1  # Set to background - 1
+            # image_data[radii_mask <= mask_radius] = background_threshold - 1  # Set to background - 1
             processed_pixels[radii_mask <= mask_radius] = True  # Ensure these pixels are not reprocessed
             last_radius=threshold_radius
             last_center=[center_y,center_x]
@@ -278,6 +278,7 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
                 continue
 
             # Mark pixels as processed for this galaxy
+            print(f"found galaxy at ({center_x}, {center_y}) with threshold radius {threshold_radius}")
             
             galaxy_count+=1
 
