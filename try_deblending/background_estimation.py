@@ -99,7 +99,7 @@ def finding_background(data, fraction_bin, sigmas_thershold):
     return background_value, background_std
 
 
-def finding_local_background(data, fraction_bin, sigmas_thershold):
+def finding_local_background(data, fraction_bin):
     num_bins = np.mean(data.shape)/fraction_bin
     #only analyse the part of data close to max value when fitting the gaussian
     if num_bins>20*fraction_bin:
@@ -125,7 +125,7 @@ def finding_local_background(data, fraction_bin, sigmas_thershold):
     # # plt.yscale('log')  # Log scale to better visualize differences in intensity
     # plt.xlabel('Pixel Intensity')
     # plt.ylabel('Frequency (Log Scale)')
-    # plt.title('Histogram of Pixel Intensities')
+    # plt.title('local background histogram')
     # plt.show()
 
     #find the maximum value
