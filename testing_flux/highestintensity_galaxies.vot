@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Produced with astropy.io.votable version 5.3.4
+<!-- Produced with astropy.io.votable version 6.1.1
      http://www.astropy.org/ -->
 <VOTABLE version="1.4" xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://www.ivoa.net/xml/VOTable/VOTable-1.4.xsd">
  <RESOURCE type="results">
@@ -11,17 +11,10 @@
    <DATA>
     <TABLEDATA>
      <TR>
-<<<<<<< HEAD
       <TD>496</TD>
       <TD>503</TD>
-      <TD>7655433.14236294</TD>
-      <TD>31044.70044269659</TD>
-=======
-      <TD>509</TD>
-      <TD>513</TD>
-      <TD>458907.77287018875</TD>
-      <TD>5052.9749720860445</TD>
->>>>>>> 77ae99666235bbd3dafb9ab2699cf94b142b9916
+      <TD>7655433.141207623</TD>
+      <TD>31044.700261026723</TD>
      </TR>
     </TABLEDATA>
    </DATA>

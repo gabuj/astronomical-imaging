@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.ndimage import label
 import matplotlib.pyplot as plt
-def takeou_bleeing(data,bleeding_centers,threshold):
+def takeou_bleeing(data,bleeding_centers,threshold,background_value):
     #get rid of bleeding regions
     #define bleeding region
 
@@ -28,7 +28,7 @@ def takeou_bleeing(data,bleeding_centers,threshold):
 
 
     galaxy_mask=np.copy(data)
-    galaxy_mask[bleeding_region==True]=0
+    galaxy_mask[bleeding_region==True]=background_value
     
     #show galaxy mask
     plt.imshow(bleeding_region, cmap='gray', origin='lower')
