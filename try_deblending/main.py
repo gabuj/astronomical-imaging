@@ -87,10 +87,10 @@ backgroundfraction_tolerance=0.9
 
 #final files parameters
 vot_file = 'test_onrealdata/galaxy_catalog.vot'
-vot_highintensity_file = "test_onrealdata/highestintensity_galaxies.vot"
+vot_highintensity_file = "try_deblending/highestintensity_galaxies.vot"
 #transform df to cat file
 cat_file = 'test_onrealdata/galaxy_catalog.cat'
-cat_highintensity_file = "test_onrealdata/highestintensity_galaxies.cat"   
+cat_highintensity_file = "try_deblending/highestintensity_galaxies.cat"   
 
 
 
