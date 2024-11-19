@@ -32,7 +32,7 @@ plt.show()
 
 #parameters for the background estimation
 fraction_bin_totalbackground=1.1 #num bins is data shape/fraction_bin
-sigmas_thershold = 5#how many sigmas of std after background is the threshold
+sigmas_thershold = 5 #how many sigmas of std after background is the threshold
 #find background
 background_value,background_std=background_estimation.finding_background(data, fraction_bin_totalbackground, sigmas_thershold) #problem!!
 background_thershold=background_value+sigmas_thershold*background_std
@@ -62,8 +62,12 @@ plt.show()
 
 
 #use only part of the data
-size=300
-data=data[0:size,0:size]
+
+min_y = 0
+max_y = 600
+min_x = 0
+max_x = 600
+data=data[min_y:max_y, min_x:max_x]
 
 
 #finding radius paramters
@@ -112,9 +116,10 @@ def radial_profile(data, max_radius, r):
     return radial_distances, radial_intensity
 
 # Fit the Sérsic profile to the radial data
-def fit_sersic(data, max_radius, r):
+def fit_sersic(data, x_center, y_center, max_radius, r):
     print(f"max radius is {max_radius}")
     radii, intensities = radial_profile(data, max_radius, r)
+    print(f"radii are {radii}")
     I_e_guess = np.max(intensities)
     r_e_guess = max_radius / 2
     n_guess = 4
@@ -134,7 +139,7 @@ def flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err):
     return total_flux, total_flux_err
 
 
-def otherway_flux_within_radius(data, max_radius, r):
+def otherway_flux_within_radius(data, x_center, y_center, max_radius, r):
     radii, intensities = radial_profile(data, max_radius, r)
     total_flux = np.sum(intensities)
     total_flux_err = np.sqrt(np.sum(intensities)) #not correct but don't know how to do it
@@ -149,7 +154,6 @@ def take_away_localbackground(data,radius,r,background_gain):
     return local_background,local_background_err
 #create data with bakcground=0 and star positions with their intensity
 data_with_star_positions = np.zeros(data.shape)
-data_with_star_positions += background_value
 
 total_fluxes = []
 total_fluxes_err = []
@@ -165,14 +169,12 @@ for i, center in enumerate(centers_list):
     
      #take away local background value from intensity
     local_background,local_background_err=take_away_localbackground(data,radius,r,background_gain)
-    temporary_data=np.copy(data)
-    #make loacl background same kind of array as data
-    local_background=np.full(data.shape,local_background)
-    temporary_data-=local_background
+   
    
     try:
-        I_e, r_e, n, I_e_err, r_e_err, n_err = fit_sersic(temporary_data, radius, r)
-        flux, flux_err = flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)
+        I_e, r_e, n, I_e_err, r_e_err, n_err = fit_sersic(data, x_center, y_center, radius, r)
+        flux=flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[0]
+        flux_err=flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)[1]
         flux=flux-local_background
         
         total_fluxes.append(flux)
@@ -180,7 +182,9 @@ for i, center in enumerate(centers_list):
     except RuntimeError:
         print(f"Could not fit Sérsic profile for galaxy {i + 1}")
         #fit in another way
-        flux,flux_err=otherway_flux_within_radius(temporary_data, radius, r)
+        flux=otherway_flux_within_radius(data, x_center, y_center, radius, r)[0]
+        flux_err=otherway_flux_within_radius(data, x_center, y_center, radius, r)[1]
+        
         total_fluxes.append(flux)
         total_fluxes_err.append(flux_err)
         flux_summed+=1
