@@ -5,7 +5,7 @@ import numpy as np
 import creating_fake_image
 import finding_center_radius
 import pandas as pd
-import  takeout_bleeing
+import  takeout_bleeding
 import background_estimation
 from astropy.io import fits
 import bad_data_clean
@@ -28,11 +28,11 @@ plt.show()
 
 
 #parameters for the background estimation
-fraction_bin_totalbackground=3 #num bins is data shape/fraction_bin
+fraction_bin_totalbackground=1.1 #num bins is data shape/fraction_bin
 sigmas_thershold = 5#how many sigmas of std after background is the threshold
 #find background
-background_thershold=background_estimation.finding_background(data, fraction_bin_totalbackground, sigmas_thershold) #problem!!
-background_thershold=3481
+background_value,background_std=background_estimation.finding_background(data, fraction_bin_totalbackground, sigmas_thershold) #problem!!
+background_thershold=background_value+sigmas_thershold*background_std
 
 #close file
 hdulist.close()
@@ -41,13 +41,13 @@ hdulist.close()
 #bleeding centerss
 bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776),(5,1430)] #list of (y, x) coordinates of the centers of the bleeding regions
 #take away bleeing
-data=takeout_bleeing.takeou_bleeing(data,bleeding_centers,background_thershold)
+data=takeout_bleeding.takeou_bleeing(data,bleeding_centers,background_thershold,background_value)
 
 #still have to do: take out bad data
 maxx=data.shape[1]
 maxy=data.shape[0]
 baddata_coords=[[0,0,33,430],[0,0,124,119],[0,0,105,408],[0,2462,126,maxx],[0,0,408,99],[0,0,430,26],[0,0,4518,4],[4516,0,maxy,120],[4504,2161,maxy,maxx],[0,2467,maxy,maxx]] #top left and top right corner of region (y1,x1,y2,x2)
-data=bad_data_clean.takeout_baddata(data,baddata_coords,background_thershold)
+data=bad_data_clean.takeout_baddata(data,baddata_coords,background_value)
 
 
 #show cleaned image
@@ -59,7 +59,7 @@ plt.show()
 
 
 #use only part of the data
-size=300
+size=600
 data=data[0:size,0:size]
 
 
@@ -90,7 +90,7 @@ cat_highintensity_file = "test_onrealdata/highestintensity_galaxies.cat"
 
 
 
-centers_list,radii_list=finding_center_radius.finding_centers_radii(data,background_thershold,max_radius,overexposed_threshold)
+centers_list,radii_list=finding_center_radius.finding_centers_radii(data,overexposed_threshold,background_value,background_std)
 x, y = np.indices(data.shape)
 
 

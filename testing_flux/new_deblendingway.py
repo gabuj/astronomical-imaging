@@ -30,7 +30,7 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
 
     # Parameters
     std_multiplier = 5
-    higher_thanbackground_blended_galaxy=10
+    higher_thanbackground_blended_galaxy=1
     background_threshold = background_level + std_multiplier * background_std # Consider anything less as background
     std_multiplier_highest_pixel = 7
     std_highest_pixel_threshold = background_level + std_multiplier_highest_pixel * background_std
@@ -161,7 +161,7 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
 
             # Check blending condition
             #If 70% is less than threshold and at least 1 value is more than threshold
-            if np.sum((radius_values < background_threshold))/(len(radius_values)) >= 0.6 and np.any(
+            if np.sum((radius_values < background_threshold))/(len(radius_values)) >= 0.7 and np.any(
                 radius_values > background_threshold + higher_thanbackground_blended_galaxy):
                 blending_detected = True
                 boundary_radius1 = i  # Mark the boundary for blending
@@ -314,7 +314,7 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
             # Mark pixels as processed for this galaxy
             print(f"found galaxy at ({center_x}, {center_y}) with threshold radius {threshold_radius}")
             #draw galaxy circle in output image
-            circle_mask = (radii1 >= threshold_radius - 1) & (radii1 <= threshold_radius + 1)
+            circle_mask = (radii_mask >= threshold_radius - 1) & (radii_mask <= threshold_radius + 1)
             output_image[circle_mask] = output_image.max()
             # Mark the center of the galaxy in black
             output_image[center_y, center_x] = background_level
