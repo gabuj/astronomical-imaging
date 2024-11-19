@@ -49,22 +49,27 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
         masked_galaxies = []  # Initialize list for masked galaxies in this iteration
         # Step 1: Find the highest pixel in the image (galaxy center)
         # Ignore already processed pixels
+        num_proc=np.sum(processed_pixels)
+        print("number of processed pixels: ",num_proc)
         masked_image = np.where(processed_pixels, background_level, image_data) #masked image is the image_data with the background level
         #show masked image
-        plt.imshow(masked_image, cmap='gray')
-        plt.colorbar()
-        plt.title('Masked Image')
-        plt.show()
+        # plt.imshow(masked_image, cmap='gray')
+        # plt.colorbar()
+        # plt.title('Masked Image')
+        # plt.show()
         
         highest_pixel_value = masked_image.max()        
-        
         if highest_pixel_value > std_highest_pixel_threshold:  # Stop if no significant peaks remain
             #center
-            center_x1, center_y1 = np.unravel_index(masked_image.argmax(), masked_image.shape)
+            #center_x1, center_y1 = np.unravel_index(masked_image.argmax(), masked_image.shape)
+            flat_index = masked_image.argmax()
+            center_y1, center_x1 = np.unravel_index(flat_index, masked_image.shape)
+            print(f"highest pixel value found at: ({center_x1}, {center_y1}), and the value is {highest_pixel_value}")
+            print(f"highest pixel value should be {masked_image[center_y1,center_x1]}")
         elif highest_pixel_value > background_threshold and highest_pixel_value <= std_highest_pixel_threshold:
              binary_mask = (masked_image > background_threshold)
              center_x1, center_y1 = np.unravel_index(masked_image.argmax(), masked_image.shape)
-             print(f"highest pixel value found at: ({center_x1}, {center_y1}), and the value is {highest_pixel_value}")
+             print(f"cemter found with centroid at: ({center_x1}, {center_y1}), and the value is {highest_pixel_value}")
              labels, num_labels = label(binary_mask)
              #if the center is part of a label, find the center of mass of that label
              galaxy_label = labels[center_y1,center_x1]
@@ -79,7 +84,9 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
                     # Masking the galaxy region
                 #  image_data[radii_mask <= mask_radius] = background_level  # Set to background
                  processed_pixels[radii_mask <= mask_radius] = True  # Ensure these pixels are not reprocessed
-                 break
+                 last_radius=mask_radius
+                 last_center=[center_y1,center_x1]
+                 continue
              center_x1, center_y1 = center_of_mass(binary_mask, labels, galaxy_label)      
              center_x1=center_x1.astype(int)
              center_y1=center_y1.astype(int)
@@ -88,16 +95,45 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
             print("No significant peaks remain")
             break
         
+        # if [center_y1, center_x1] == last_center:
+        #     print("Same center as last iteration. masking this part.")
+        #     mask_centery, mask_centerx = last_center
+        #     mask_radius = last_radius + 20
+        #     print(f"masking with mask radius: {mask_radius}")
+        #     y_indices_mask, x_indices_mask = np.indices(image_data.shape)
+        #     radii_mask = np.sqrt((x_indices_mask - mask_centerx) ** 2 + (y_indices_mask - mask_centery) ** 2)
+        #     radii_mask = radii_mask.astype(int)
+        #     # Masking the galaxy region
+        #     processed_pixels[radii_mask <= mask_radius] = True  # Ensure these pixels are not reprocessed 
+        #     #show masked radius
+        #     masked_image[radii_mask<=mask_radius]  == 4000
+        #     masked_image[mask_centery,mask_centerx] = 4000
+        #     plt.imshow(masked_image, cmap='gray')
+        #     plt.colorbar()
+        #     plt.title('Masked Image shoiwing radius')
+        #     plt.show() 
+        #     last_radius=mask_radius
+        #     continue  
+        
+        print(f"value at center is {masked_image[center_y1,center_x1]}")
         if [center_y1, center_x1] == last_center:
             print("Same center as last iteration. masking this part.")
             mask_centery, mask_centerx = last_center
-            mask_radius = last_radius + 10
+            mask_radius = last_radius + 20
+            print(f"masking with mask radius: {mask_radius}")
             y_indices_mask, x_indices_mask = np.indices(image_data.shape)
             radii_mask = np.sqrt((x_indices_mask - mask_centerx) ** 2 + (y_indices_mask - mask_centery) ** 2)
             radii_mask = radii_mask.astype(int)
-            # Masking the galaxy region
-            processed_pixels[radii_mask <= mask_radius] = True  # Ensure these pixels are not reprocessed           
-        
+            search_region=masked_image.copy()
+            search_region[~(radii_mask >= mask_radius)]=background_level #everything outside the mask radius is set to background level
+            #find closest label to center and take it away
+            labels, num_labels = label(search_region > background_threshold)
+            galaxy_label = labels[mask_centery,mask_centerx]
+            print(f"galaxy label: {galaxy_label}")
+            processed_pixels[labels == galaxy_label] = True
+            last_radius=mask_radius
+                     
+            continue  
         
         y_indices, x_indices = np.indices(image_data.shape)
         radii1 = np.sqrt((x_indices - center_x1) ** 2 + (y_indices - center_y1) ** 2)
@@ -235,10 +271,10 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
                 # Proceed to process the first galaxy only
                 # Draw the circle and mark pixels for the first galaxy only
                 # Draw the circle for the first galaxy
-                circle_mask1 = (radii1 >= threshold_radius1 - 1) & (radii1 <= threshold_radius1 + 1)
-                output_image[circle_mask1] = output_image.max()  # Boundary in white
-                # Mark the center of the first galaxy in black
-                output_image[center_y1, center_x1] = background_level
+                # circle_mask1 = (radii1 >= threshold_radius1 - 1) & (radii1 <= threshold_radius1 + 1)
+                # output_image[circle_mask1] = output_image.max()  # Boundary in white
+                # # Mark the center of the first galaxy in black
+                # output_image[center_y1, center_x1] = background_level
                 # Mark pixels as processed for the first galaxy
                 processed_pixels[radii1 <= threshold_radius1] = True
         else:
@@ -277,7 +313,11 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
 
             # Mark pixels as processed for this galaxy
             print(f"found galaxy at ({center_x}, {center_y}) with threshold radius {threshold_radius}")
-            
+            #draw galaxy circle in output image
+            circle_mask = (radii1 >= threshold_radius - 1) & (radii1 <= threshold_radius + 1)
+            output_image[circle_mask] = output_image.max()
+            # Mark the center of the galaxy in black
+            output_image[center_y, center_x] = background_level
             galaxy_count+=1
 
         # Continue with the loop
@@ -285,10 +325,10 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
     print(f"\nTotal number of galaxies detected: {galaxy_count}")
 
     # Optional: Display the image
-    # plt.imshow(output_image, cmap='gray')
-    # plt.colorbar()x
-    # plt.title('Detected Galaxies')
-    # plt.show()
+    plt.imshow(output_image, cmap='gray')
+    plt.colorbar()
+    plt.title('Detected Galaxies')
+    plt.show()
     
     return centers_list, radii_list
 
