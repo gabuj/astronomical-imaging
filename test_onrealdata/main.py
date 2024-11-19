@@ -62,7 +62,7 @@ plt.show()
 
 
 #use only part of the data
-size=200
+size=260
 data=data[0:size,0:size]
 
 #finding radius paramters
@@ -102,8 +102,8 @@ def sersic_profile(r, I_e, r_e, n):
 # Create radial distances and intensities for the galaxy
 def radial_profile(data, max_radius, r):
     # Step 3: Calculate the radial intensity profile by averaging pixel values at each radius
-    radial_distances=np.arange(1,max_radius+1)
-    radial_intensity = np.array([data[r == rad].mean() if np.any(r == r) else 0 for rad in radial_distances])
+    radial_distances=np.arange(0,max_radius+1)
+    radial_intensity = np.array([data[r == rad].mean() for rad in radial_distances])
     # print(f"radial distances are {radial_distances}")
     # print(f"radial intensities are {radial_intensity}")
     return radial_distances, radial_intensity
@@ -121,6 +121,17 @@ def fit_sersic(data, max_radius, r):
     print(f"I_e: {I_e} +/- {I_e_err}")
     print(f"r_e: {r_e} +/- {r_e_err}")
     print(f"n: {n} +/- {n_err}")
+    
+    #plot data and fit to see if it is correct
+    plt.figure()
+    plt.plot(radii, intensities, label='Data')
+    plt.plot(radii, sersic_profile(radii, I_e, r_e, n), label='Fit')
+    plt.xlabel('Radius')
+    plt.ylabel('Intensity')
+    plt.legend()
+    plt.show()
+    
+    
     return I_e, r_e, n, I_e_err, r_e_err, n_err
 
 def flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err):
@@ -167,36 +178,36 @@ for i, center in enumerate(centers_list):
     #make loacl background same kind of array as data
     temporary_data-=local_background    
    
-    try:
-        I_e, r_e, n, I_e_err, r_e_err, n_err = fit_sersic(temporary_data, radius, r)
-        flux, flux_err = flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)
-        total_fluxes.append(flux)
-        total_fluxes_err.append(flux_err)
-    except RuntimeError:
-        print(f"Could not fit Sérsic profile for galaxy {i + 1}")
+    # try:
+    #     I_e, r_e, n, I_e_err, r_e_err, n_err = fit_sersic(temporary_data, radius, r)
+    #     flux, flux_err = flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)
+    #     total_fluxes.append(flux)
+    #     total_fluxes_err.append(flux_err)
+    # except RuntimeError:
+        # print(f"Could not fit Sérsic profile for galaxy {i + 1}")
         #fit in another way
-        flux,flux_err=otherway_flux_within_radius(temporary_data, radius, r)
-        total_fluxes.append(flux)
-        total_fluxes_err.append(flux_err)
-        flux_summed+=1
-        continue
+    flux,flux_err=otherway_flux_within_radius(temporary_data, radius, r)
+    total_fluxes.append(flux)
+    total_fluxes_err.append(flux_err)
+    flux_summed+=1
+        # continue
     print(f"Total flux for galaxy {i + 1}: {flux} +/- {flux_err}")
     
     
     #to check if doinf correct job create own image with centers, raii and intensity found and see if same aas old image
-    galaxy_profile = sersic_profile(r, I_e, r_e, n)
+    # galaxy_profile = sersic_profile(r, I_e, r_e, n)
     #add the galaxy profile around its center
-    data_with_star_positions += galaxy_profile
+    # data_with_star_positions += galaxy_profile
     
 # plot original image and created model image
-plt.figure(figsize=(10, 5))
-plt.subplot(1, 2, 1)
-plt.imshow(data, cmap='gray', origin='lower')
-plt.title('Original Image')
-plt.subplot(1, 2, 2)
-plt.imshow(data_with_star_positions, cmap='gray', origin='lower')
-plt.title('Model Image')
-plt.show()
+# plt.figure(figsize=(10, 5))
+# plt.subplot(1, 2, 1)
+# plt.imshow(data, cmap='gray', origin='lower')
+# plt.title('Original Image')
+# plt.subplot(1, 2, 2)
+# plt.imshow(data_with_star_positions, cmap='gray', origin='lower')
+# plt.title('Model Image')
+# plt.show()
 
 for i in range(len(total_fluxes)):
     print(f"Total flux for galaxy {i + 1}: {total_fluxes[i]} +/- {total_fluxes_err[i]}")

@@ -228,7 +228,7 @@ def finding_centers_radii(data, overexposed_threshold, background_level, backgro
                     # Found the second center
                     center_y2, center_x2 = y, x
                     second_peak_value = pixel_value
-                    galaxy_count += 1
+                    # galaxy_count += 1
                     print(f"Second Galaxy {galaxy_count} detected at Center: ({center_x2}, {center_y2}), Peak Brightness: {second_peak_value}")
                     # Calculate radial distances for the second galaxy
                     radii2 = np.sqrt((x_indices - center_x2) ** 2 + (y_indices - center_y2) ** 2)
