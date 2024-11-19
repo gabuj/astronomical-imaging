@@ -15,8 +15,8 @@ from astropy.visualization import ZScaleInterval, ImageNormalize
 zscale_interval = ZScaleInterval()
 
 #gete data
-max_localbackground_radius=200
-fraction_bin=max_localbackground_radius*2
+max_localbackground_radius = 200
+fraction_bin = max_localbackground_radius * 2
 
 
 
@@ -66,11 +66,11 @@ plt.show()
 
 
 #use only part of the data
-size=1000
+size = 500
 data=data[0:size,0:size]
 
 #finding radius paramters
-overexposed_threshold=65535
+overexposed_threshold = 65535
 #create the data
 # data=creating_fake_image.create_fake_image(image_size, centers, galaxy_peaks, sigmas,background_value,noise_level,ns)
 
@@ -86,10 +86,10 @@ backgroundfraction_tolerance=0.9
 
 
 #final files parameters
-vot_file = 'test_onrealdata/galaxy_catalog.vot'
+vot_file = 'try_deblending/galaxy_catalog.vot'
 vot_highintensity_file = "try_deblending/highestintensity_galaxies.vot"
 #transform df to cat file
-cat_file = 'test_onrealdata/galaxy_catalog.cat'
+cat_file = 'try_deblending/galaxy_catalog.cat'
 cat_highintensity_file = "try_deblending/highestintensity_galaxies.cat"   
 
 
