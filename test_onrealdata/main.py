@@ -165,7 +165,7 @@ data=original_data
 flux_summed=0
 for i, center in enumerate(centers_list):
     
-    y_center, x_center = center
+    x_center, y_center = center
     radius = radii_list[i]
     print(f"analysing galaxy {i + 1} at center ({x_center}, {y_center}) with radius {radius}")
     #convert to integer for binning
@@ -176,7 +176,18 @@ for i, center in enumerate(centers_list):
     local_background,local_background_err=take_away_localbackground(data,radius,r)
     temporary_data=np.copy(data).astype(float)
     #make loacl background same kind of array as data
-    temporary_data-=local_background    
+    temporary_data-=local_background
+    #show temporary data
+    imageshow=np.copy(temporary_data)
+    #show circles around the centers
+    circle_mask=(r<=radius + 1) & (r>=radius - 1)
+    imageshow[circle_mask]=imageshow.max()
+    plt.imshow(imageshow, cmap='gray', origin='lower')
+    plt.colorbar()
+    plt.title('Temporary Image')
+    plt.show()
+    
+    
    
     # try:
     #     I_e, r_e, n, I_e_err, r_e_err, n_err = fit_sersic(temporary_data, radius, r)
