@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 import subprocess
 from astropy.io import fits
 from scipy.ndimage import label, center_of_mass
-
-#import centroids
+from scipy.ndimage import maximum_filter
 
 # Loop to detect galaxies until no significant peak remains
 
@@ -17,7 +16,7 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
     # Important tuning percentage parameters
     image_data = np.copy(data)
     # Radius relative to hole radius in respect to the first centre where to start
-    min_rad = 0.3
+    min_rad = 0.5
     minimum_radius = 4
     # Relative intensity of second centre
     relative_int = 0.01
@@ -162,74 +161,64 @@ def finding_centers_radii(data, max_possible_radius, overexposed_threshold, back
             
             # Start from radius 10 from the first galaxy's center
             min_radius = int(threshold_radius1 * min_rad) # perché? sei sicuro non sia biased?
-            max_radius = threshold_radius1 + 200  # Extend beyond the first galaxy's boundary
+            max_radius = threshold_radius1*4 #search 2 radii apart from the first galaxy
             found_second_center = False
-            for current_radius in range(min_radius, max_radius):
-                # Get the indices of pixels at this radius
-                shell_mask = (radii1 == current_radius) & ~processed_pixels
-                y_indices_shell, x_indices_shell = np.where(shell_mask)
-                for y, x in zip(y_indices_shell, x_indices_shell):
-                    # Exclude the first center
-                    if (y == center_y1) and (x == center_x1):
-                        continue
-                    # Get the value of the current pixel
-                    pixel_value = image_data[y, x]
-                    # Check if the pixel value is greater than its immediate neighbors
-                    neighbors = []
-                    if y > 0:
-                        neighbors.append(image_data[y - 1, x])
-                    if y < image_data.shape[0] - 1:
-                        neighbors.append(image_data[y + 1, x])
-                    if x > 0:
-                        neighbors.append(image_data[y, x - 1])
-                    if x < image_data.shape[1] - 1:
-                        neighbors.append(image_data[y, x + 1])
-                    # Check if the pixel value is greater than all its neighbors
-                    if all(pixel_value > neighbor for neighbor in neighbors):
-                        # Check if pixel value is within percentage of the first center's value
-                        if pixel_value >= background_threshold:
-                            # Found the second center
-                            center_y2, center_x2 = y, x
-                            second_peak_value = pixel_value
-                            galaxy_count += 1
-                            print(f"Second Galaxy {galaxy_count} detected at Center: ({center_x2}, {center_y2}), Peak Brightness: {second_peak_value}")
-                            # Calculate radial distances for the second galaxy
-                            radii2 = np.sqrt((x_indices - center_x2) ** 2 + (y_indices - center_y2) ** 2)
-                            radii2 = radii2.astype(int)
-                            # Calculate the radial intensity profile for the second galaxy
-                            radial_profile2 = np.array([
-                                image_data[(radii2 == r) & ~processed_pixels].mean() if np.any((radii2 == r) & ~processed_pixels) else 0
-                                for r in range(max_possible_radius)
-                            ])
-                            # Smooth the radial profile
-                            smoothed_profile2 = gaussian_filter(radial_profile2, sigma=2)
-                            # Determine the boundary for the second galaxy
-                            threshold_radius2 = None
-                            for j in range(len(smoothed_profile2) - 1):
-                                current_radius2 = j + 1
-                                radius_values2 = image_data[(radii2 == current_radius2) & ~processed_pixels]  # Exclude already processed pixels
+            #take away inner part of first galaxy
+            temporary_mask = (radii1 >= min_radius) & (radii1 <= max_radius)
+            temporary_mask_image=masked_image.copy()
+            temporary_mask_image[~temporary_mask]=background_level
+            local_max = (image_data == maximum_filter(temporary_mask_image, size=max_radius))
+            # local_max[radii1 <= min_radius] = False
+            local_max = local_max & (masked_image > background_threshold)
+            # Get the indices of pixels at this radius
+            y_indices_shell, x_indices_shell = np.where(local_max)
+            for y, x in zip(y_indices_shell, x_indices_shell):
+                print(f"local max at ({x},{y})")
+                pixel_value = image_data[y, x]           
+                pixel_value=0
+                if pixel_value >= background_threshold:
+                    # Found the second center
+                    center_y2, center_x2 = y, x
+                    second_peak_value = pixel_value
+                    galaxy_count += 1
+                    print(f"Second Galaxy {galaxy_count} detected at Center: ({center_x2}, {center_y2}), Peak Brightness: {second_peak_value}")
+                    # Calculate radial distances for the second galaxy
+                    radii2 = np.sqrt((x_indices - center_x2) ** 2 + (y_indices - center_y2) ** 2)
+                    radii2 = radii2.astype(int)
+                    # Calculate the radial intensity profile for the second galaxy
+                    radial_profile2 = np.array([
+                        image_data[(radii2 == r) & ~processed_pixels].mean() if np.any((radii2 == r) & ~processed_pixels) else 0
+                        for r in range(max_possible_radius)
+                    ])
+                    # Smooth the radial profile
+                    smoothed_profile2 = gaussian_filter(radial_profile2, sigma=2)
+                    # Determine the boundary for the second galaxy
+                    threshold_radius2 = None
+                    for j in range(len(smoothed_profile2) - 1):
+                        current_radius2 = j + 1
+                        radius_values2 = image_data[(radii2 == current_radius2) & ~processed_pixels]  # Exclude already processed pixels
 
-                                # Check blending condition for second galaxy
-                                if np.sum((radius_values2 < background_threshold))/(len(radius_values2)) >= 0.3:
-                                    threshold_radius2 = current_radius2  # Mark the boundary for blending
-                                    print(f"Blending detected for Galaxy {galaxy_count} at radius {threshold_radius2}")
-                                    break
+                        # Check blending condition for second galaxy
+                        if np.sum((radius_values2 < background_threshold))/(len(radius_values2)) >= 0.3:
+                            threshold_radius2 = current_radius2  # Mark the boundary for blending
+                            print(f"Blending detected for Galaxy {galaxy_count} at radius {threshold_radius2}")
+                            break
 
-                            if threshold_radius2 is None:
-                                # threshold_radius2 = max_possible_radius
-                                print(f"not found radius of second blended galaxy")
-                            masked_galaxies.append((center_y2, center_x2, threshold_radius2))
-                            #append to detected_galaxies if radius is greater than minimum radius and not overexposed
-                            if threshold_radius2 >= minimum_radius and image_data[center_y2, center_x2] < overexposed_threshold:
-                                detected_galaxies.append((center_y2, center_x2, threshold_radius2))
-                                
-                            
-                            # Append to centers_list and radii_list
-                            centers_list.append((center_x2, center_y2))
-                            radii_list.append(threshold_radius2)
-                            
-                            found_second_center = True
-                            break  # Exit the inner loop
+                    if threshold_radius2 is None:
+                        # threshold_radius2 = max_possible_radius
+                        print(f"not found radius of second blended galaxy")
+                    masked_galaxies.append((center_y2, center_x2, threshold_radius2))
+                    #append to detected_galaxies if radius is greater than minimum radius and not overexposed
+                    if threshold_radius2 >= minimum_radius and image_data[center_y2, center_x2] < overexposed_threshold:
+                        detected_galaxies.append((center_y2, center_x2, threshold_radius2))
+                        
+                    
+                    # Append to centers_list and radii_list
+                    centers_list.append((center_x2, center_y2))
+                    radii_list.append(threshold_radius2)
+                    
+                    found_second_center = True
+                    break  # Exit the inner loop
                 if found_second_center:
                     break  # Exit the outer loop
             if not found_second_center:
