@@ -13,7 +13,6 @@ import bad_data_clean
 #gete data
 max_localbackground_radius=200
 fraction_bin=max_localbackground_radius*2
-background_gain=3 #how many times more than radius is local background radius
 
 
 
@@ -33,7 +32,7 @@ plt.show()
 
 #parameters for the background estimation
 fraction_bin_totalbackground=1.1 #num bins is data shape/fraction_bin
-sigmas_thershold = 5#how many sigmas of std after background is the threshold
+sigmas_thershold = 3#how many sigmas of std after background is the threshold
 #find background
 background_value,background_std=background_estimation.finding_background(data, fraction_bin_totalbackground, sigmas_thershold) #problem!!
 background_thershold=background_value+sigmas_thershold*background_std
@@ -92,7 +91,7 @@ cat_highintensity_file = "test_onrealdata/highestintensity_galaxies.cat"
 
 
 
-centers_list,radii_list=finding_center_radius.finding_centers_radii(data,overexposed_threshold,background_value,background_std,background_gain)
+centers_list,radii_list=finding_center_radius.finding_centers_radii(data,overexposed_threshold,background_value,background_std,sigmas_thershold)
 x, y = np.indices(data.shape)
 
 # Define the Sérsic profile
@@ -105,8 +104,8 @@ def radial_profile(data, max_radius, r):
     # Step 3: Calculate the radial intensity profile by averaging pixel values at each radius
     radial_distances=np.arange(1,max_radius+1)
     radial_intensity = np.array([data[r == rad].mean() if np.any(r == r) else 0 for rad in radial_distances])
-    print(f"radial distances are {radial_distances}")
-    print(f"radial intensities are {radial_intensity}")
+    # print(f"radial distances are {radial_distances}")
+    # print(f"radial intensities are {radial_intensity}")
     return radial_distances, radial_intensity
 
 # Fit the Sérsic profile to the radial data
@@ -138,11 +137,11 @@ def otherway_flux_within_radius(data, max_radius, r):
     total_flux_err = np.sqrt(np.sum(intensities)) #not correct but don't know how to do it
     return total_flux, total_flux_err
 
-def take_away_localbackground(data,radius,r,background_gain):
+def take_away_localbackground(data,radius,r):
     #take away local background value from intensity
     max_radius=max_localbackground_radius
     background_data=data[r<=max_radius]
-    local_background=background_estimation.finding_local_background(background_data, fraction_bin, sigmas_thershold)
+    local_background=background_estimation.finding_local_background(background_data, fraction_bin)
     local_background_err=0
     return local_background,local_background_err
 #create data with bakcground=0 and star positions with their intensity
@@ -157,23 +156,20 @@ for i, center in enumerate(centers_list):
     
     y_center, x_center = center
     radius = radii_list[i]
+    print(f"analysing galaxy {i + 1} at center ({x_center}, {y_center}) with radius {radius}")
     #convert to integer for binning
     r = np.sqrt((x - x_center)**2 + (y - y_center)**2)
     r = r.astype(int)
     
      #take away local background value from intensity
-    local_background,local_background_err=take_away_localbackground(data,radius,r,background_gain)
+    local_background,local_background_err=take_away_localbackground(data,radius,r)
     temporary_data=np.copy(data).astype(float)
     #make loacl background same kind of array as data
-    local_background=np.full(data.shape,local_background)
-    local_background=local_background.astype(float)
-    temporary_data-=local_background
+    temporary_data-=local_background    
    
     try:
         I_e, r_e, n, I_e_err, r_e_err, n_err = fit_sersic(temporary_data, radius, r)
         flux, flux_err = flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err)
-        flux=flux-local_background
-        
         total_fluxes.append(flux)
         total_fluxes_err.append(flux_err)
     except RuntimeError:
@@ -184,6 +180,7 @@ for i, center in enumerate(centers_list):
         total_fluxes_err.append(flux_err)
         flux_summed+=1
         continue
+    print(f"Total flux for galaxy {i + 1}: {flux} +/- {flux_err}")
     
     
     #to check if doinf correct job create own image with centers, raii and intensity found and see if same aas old image
