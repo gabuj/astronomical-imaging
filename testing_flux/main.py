@@ -16,10 +16,10 @@ fraction_bin=max_localbackground_radius*2
 #creating fake image data
 # Parameters for creating images
 image_size = (1028, 1028)
-centers = [(500, 500)]
-peaks = [20]
-sigmas = [25]
-ns = [0.5]
+centers = [(500, 500),(535,535)]
+peaks = [30,150]
+sigmas = [25, 25]
+ns = [0.5, 0.5]
 
 noise_level = 5
 background_level = 3415
