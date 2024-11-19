@@ -12,6 +12,9 @@ import bad_data_clean
 #gete data
 max_localbackground_radius=200
 fraction_bin=max_localbackground_radius*2
+background_gain=3 #how many times more than radius is local background radius
+
+
 
 #open file
 path='fits_file/mosaic.fits'
@@ -65,7 +68,6 @@ data=data[0:size,0:size]
 
 #finding radius paramters
 overexposed_threshold=65535
-background_gain=3 #how many times more than radius is local background radius
 #create the data
 # data=creating_fake_image.create_fake_image(image_size, centers, galaxy_peaks, sigmas,background_value,noise_level,ns)
 
@@ -90,7 +92,7 @@ cat_highintensity_file = "test_onrealdata/highestintensity_galaxies.cat"
 
 
 
-centers_list,radii_list=finding_center_radius.finding_centers_radii(data,overexposed_threshold,background_value,background_std)
+centers_list,radii_list=finding_center_radius.finding_centers_radii(data,overexposed_threshold,background_value,background_std,background_gain)
 x, y = np.indices(data.shape)
 
 

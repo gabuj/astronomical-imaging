@@ -10,7 +10,7 @@ from scipy.ndimage import maximum_filter
 # Loop to detect galaxies until no significant peak remains
 
 
-def finding_centers_radii(data, overexposed_threshold, background_level, background_std):
+def finding_centers_radii(data, overexposed_threshold, background_level, background_std,std_multiplier):
     # PARAMETERS WE CAN CORRECT
     # Important tuning percentage parameters
     image_data = np.copy(data)
@@ -31,7 +31,6 @@ def finding_centers_radii(data, overexposed_threshold, background_level, backgro
     #     image_data = hdul[0].data.copy()  # Copy of the 2D array of pixel values
 
     # Parameters
-    std_multiplier = 5
     higher_thanbackground_blended_galaxy=1
     background_threshold = background_level + std_multiplier * background_std # Consider anything less as background
     std_multiplier_highest_pixel = 7
