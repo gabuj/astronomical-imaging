@@ -62,7 +62,7 @@ plt.show()
 
 
 #use only part of the data
-size=600
+size=300
 data=data[0:size,0:size]
 
 
@@ -115,6 +115,7 @@ def radial_profile(data, max_radius, r):
 def fit_sersic(data, x_center, y_center, max_radius, r):
     print(f"max radius is {max_radius}")
     radii, intensities = radial_profile(data, max_radius, r)
+    print(f"radii are {radii}")
     I_e_guess = np.max(intensities)
     r_e_guess = max_radius / 2
     n_guess = 4

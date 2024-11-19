@@ -201,8 +201,8 @@ def finding_centers_radii(data, overexposed_threshold, background_level, backgro
             # Proceed to detect the second galaxy
             masked_galaxies.append((center_y1, center_x1, threshold_radius1))
             #append to detected_galaxies if radius is greater than minimum radius and not overexposed
-            if threshold_radius1 >= minimum_radius and image_data[center_y1, center_x1] < overexposed_threshold:
-                detected_galaxies.append((center_y1, center_x1, threshold_radius1))
+            # if threshold_radius1 >= minimum_radius and image_data[center_y1, center_x1] < overexposed_threshold:
+            #     detected_galaxies.append((center_y1, center_x1, threshold_radius1))
             
             # Append to centers_list and radii_list
             centers_list.append((center_x1, center_y1))
@@ -257,8 +257,8 @@ def finding_centers_radii(data, overexposed_threshold, background_level, backgro
                         print(f"not found radius of second blended galaxy")
                     masked_galaxies.append((center_y2, center_x2, threshold_radius2))
                     #append to detected_galaxies if radius is greater than minimum radius and not overexposed
-                    if threshold_radius2 >= minimum_radius and image_data[center_y2, center_x2] < overexposed_threshold:
-                        detected_galaxies.append((center_y2, center_x2, threshold_radius2))
+                    # if threshold_radius2 >= minimum_radius and image_data[center_y2, center_x2] < overexposed_threshold:
+                    #     detected_galaxies.append((center_y2, center_x2, threshold_radius2))
                         
                     
                     # Append to centers_list and radii_list
@@ -281,8 +281,8 @@ def finding_centers_radii(data, overexposed_threshold, background_level, backgro
         
             masked_galaxies.append((center_y1, center_x1, not_blended_radius))
             #append to detected_galaxies if radius is greater than minimum radius and not overexposed
-            if not_blended_radius >= minimum_radius and image_data[center_y1, center_x1] < overexposed_threshold:
-                detected_galaxies.append((center_y1, center_x1, not_blended_radius))
+            # if not_blended_radius >= minimum_radius and image_data[center_y1, center_x1] < overexposed_threshold:
+            #     detected_galaxies.append((center_y1, center_x1, not_blended_radius))
                 
             
             # Append to centers_list and radii_list
@@ -310,7 +310,10 @@ def finding_centers_radii(data, overexposed_threshold, background_level, backgro
             if image_data[center_y, center_x] > overexposed_threshold:
                 print(f"Galaxy at ({center_x}, {center_y}) is overexposed. Skipping adding to galaxies.")
                 continue
-
+            
+            #append to detected galaxies
+            detected_galaxies.append((center_y, center_x, threshold_radius))
+            
             # Mark pixels as processed for this galaxy
             print(f"found galaxy at ({center_x}, {center_y}) with threshold radius {threshold_radius}")
             #draw galaxy circle in output image
