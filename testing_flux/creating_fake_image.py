@@ -41,22 +41,22 @@ def create_fake_image(image_size, centers, galaxy_peaks, sigmas, background_leve
     return image_data
 
 # # Parameters for creating images
-# image_size = (1028, 1028)
-# centers = [(500, 500), (560, 500), (500, 560)]
-# peaks = [180, 150, 150]
-# sigmas = [25, 20, 20]
-# ns = [0.5, 0.5, 0.5]
+image_size = (1028, 1028)
+centers = [(500, 500),(700,700),(300,300),(200,200),(800,800),(350,350)]
+peaks = [200,50, 300, 50, 75, 100]
+sigmas = [25, 8,50, 10, 15, 20]
+ns = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
 
-# noise_level = 5
-# background_level = 3415
+noise_level = 5
+background_level = 3415
 
-# # Create the synthetic image
-# image_data = create_fake_image(image_size, centers, peaks, sigmas, background_level, noise_level, ns)
+# Create the synthetic image
+image_data = create_fake_image(image_size, centers, peaks, sigmas, background_level, noise_level, ns)
 
 # # Save the generated image as a FITS file
-# name = "3_cluster"
-# output_path = f"fake_files/{name}.npy"
-# np.save(output_path, image_data)
+name = "nice_lotsofgalaxies"
+output_path = f"fake_files/{name}.npy"
+np.save(output_path, image_data)
 # print(f"File saved to {output_path}")
 
 # Uncomment below if you'd like to view the last generated image

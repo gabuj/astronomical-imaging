@@ -3,11 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
 import creating_fake_image
-import finding_center_radius
 import pandas as pd
 import background_estimation
 from astropy.io import fits
-import bad_data_clean
 import new_deblendingway
 #get data
 max_localbackground_radius=200
@@ -17,16 +15,17 @@ fraction_bin=max_localbackground_radius*2
 #creating fake image data
 # Parameters for creating images
 image_size = (1028, 1028)
-centers = [(500, 500),(545,545)]
-peaks = [200,150]
-sigmas = [25, 25]
-ns = [0.5, 0.5]
+centers = [(500, 500),(700,700),(300,300),(200,200),(800,800),(350,350)]
+peaks = [200,50, 300, 50, 75, 100]
+sigmas = [25, 8,50, 10, 15, 20]
+ns = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
 
 noise_level = 5
 background_level = 3415
 
-data=creating_fake_image.create_fake_image(image_size, centers, peaks, sigmas,background_level,noise_level,ns)
-
+# data=creating_fake_image.create_fake_image(image_size, centers, peaks, sigmas,background_level,noise_level,ns)
+filename="fake_files/nice_lotsofgalaxies.npy"
+data=np.load(filename)
 
 #show initial image
 plt.imshow(data, cmap='gray', origin='lower')
@@ -45,33 +44,6 @@ noise_level = 5
 background_thershold= background_level + 5 * noise_level
 
 background_std=noise_level
-
-# fraction_bin = 1
-
-#bleeding centers, UNCOMMENT FOR REAL FILES
-#bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776),(5,1430)] #list of (y, x) coordinates of the centers of the bleeding regions
-#take away bleeing
-#data=takeout_bleeding.takeou_bleeing(data,bleeding_centers,background_thershold)
-
-#still have to do: take out bad data
-# maxx=data.shape[1]
-# maxy=data.shape[0]
-# baddata_coords=[[0,0,33,430],[0,0,124,119],[0,0,105,408],[0,2462,126,maxx],[0,0,408,99],[0,0,430,26],[0,0,4518,4],[4516,0,maxy,120],[4504,2161,maxy,maxx],[0,2467,maxy,maxx]] #top left and top right corner of region (y1,x1,y2,x2)
-# data=bad_data_clean.takeout_baddata(data,baddata_coords,background_thershold)
-
-
-#show cleaned image
-#show image in zscale
-plt.imshow(data, cmap='gray', origin='lower')
-plt.colorbar()
-plt.title('Cleaned Image')
-plt.show()
-
-
-#use only part of the data
-# size=300
-# data=data[0:size,0:size]
-
 
 #finding radius paramters
 overexposed_threshold=65535
@@ -149,8 +121,13 @@ def flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err):
 
 def otherway_flux_within_radius(data, x_center, y_center, max_radius, r):
     radii, intensities = radial_profile(data, max_radius, r)
+    gain=1.8
+    R=10
     total_flux = np.sum(intensities)
-    total_flux_err = np.sqrt(np.sum(intensities)) #not correct but don't know how to do it
+    var=0
+    for intensity in intensities:
+        var+=(intensity/gain) + (R/gain)**2
+    total_flux_err = np.sqrt(var)
     return total_flux, total_flux_err
 
 def take_away_localbackground(data,radius,r,background_gain):
@@ -162,7 +139,7 @@ def take_away_localbackground(data,radius,r,background_gain):
     return local_background,local_background_err
 #create data with bakcground=0 and star positions with their intensity
 data_with_star_positions = np.zeros(data.shape)
-noise=noise = np.random.normal(background_level, noise_level, image_size)
+noise=np.random.normal(background_level, noise_level, image_size)
 data_with_star_positions += noise
 
 total_fluxes = []
