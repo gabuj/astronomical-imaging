@@ -63,7 +63,7 @@ plt.show()
 
 
 #use only part of the data
-size=1200
+size=1000
 data=data[0:size,0:size]
 
 #finding radius paramters
@@ -145,8 +145,13 @@ def flux_within_radius(I_e, r_e, n, I_e_err, r_e_err, n_err):
 
 def otherway_flux_within_radius(data, max_radius, r):
     radii, intensities = radial_profile(data, max_radius, r)
+    gain=1.8
+    R=10
     total_flux = np.sum(intensities)
-    total_flux_err = np.sqrt(np.sum(intensities)) #not correct but don't know how to do it
+    var=0
+    for intensity in intensities:
+        var+=(intensity/gain) + (R/gain)**2
+    total_flux_err = np.sqrt(var)
     return total_flux, total_flux_err
 
 def take_away_localbackground(data,radius,r):

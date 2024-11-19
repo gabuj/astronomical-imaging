@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Produced with astropy.io.votable version 6.1.1
+     http://www.astropy.org/ -->
+<VOTABLE version="1.4" xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://www.ivoa.net/xml/VOTable/VOTable-1.4.xsd">
+ <RESOURCE type="results">
+  <TABLE>
+   <FIELD ID="x" datatype="long" name="x"/>
+   <FIELD ID="y" datatype="long" name="y"/>
+   <FIELD ID="intensity" datatype="double" name="intensity"/>
+   <FIELD ID="intensity_error" datatype="double" name="intensity error"/>
+   <DATA>
+    <TABLEDATA>
+     <TR>
+      <TD>65</TD>
+      <TD>662</TD>
+      <TD>195590.6696608336</TD>
+      <TD>442.25633931107603</TD>
+     </TR>
+     <TR>
+      <TD>627</TD>
+      <TD>294</TD>
+      <TD>6640.304753997147</TD>
+      <TD>81.48806510156653</TD>
+     </TR>
+     <TR>
+      <TD>687</TD>
+      <TD>294</TD>
+      <TD>5100.934914138608</TD>
+      <TD>71.42082969371477</TD>
+     </TR>
+     <TR>
+      <TD>440</TD>
+      <TD>694</TD>
+      <TD>3995.921975200362</TD>
+      <TD>63.213305365250136</TD>
+     </TR>
+     <TR>
+      <TD>189</TD>
+      <TD>765</TD>
+      <TD>3938.0160772642366</TD>
+      <TD>62.75361405739304</TD>
+     </TR>
+     <TR>
+      <TD>190</TD>
+      <TD>350</TD>
+      <TD>3400.874235527542</TD>
+      <TD>58.317014974426996</TD>
+     </TR>
+     <TR>
+      <TD>280</TD>
+      <TD>760</TD>
+      <TD>3203.7427957876166</TD>
+      <TD>56.60161478074293</TD>
+     </TR>
+     <TR>
+      <TD>633</TD>
+      <TD>294</TD>
+      <TD>3143.356923558902</TD>
+      <TD>56.06564833798769</TD>
+     </TR>
+     <TR>
+      <TD>185</TD>
+      <TD>760</TD>
+      <TD>2534.4939093678713</TD>
+      <TD>50.34375740216329</TD>
+     </TR>
+     <TR>
+      <TD>94</TD>
+      <TD>545</TD>
+      <TD>2458.1690888554235</TD>
+      <TD>49.57992626916082</TD>
+     </TR>
+    </TABLEDATA>
+   </DATA>
+  </TABLE>
+ </RESOURCE>
+</VOTABLE>

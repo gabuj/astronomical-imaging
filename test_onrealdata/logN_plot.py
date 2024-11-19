@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 #data is contained in cat file
-filename = "C:/SAOImageDS9/my_project_outputs/test_onrealdata/size_1000/galaxy_catalog.cat"
+filename = "C:/SAOImageDS9/my_project_outputs/test_onrealdata/flux/size_600/galaxy_catalog.cat"
 fluxes, fluxes_err = np.loadtxt(filename, delimiter=' ', skiprows=1, usecols=(2,3), unpack=True)
 # Create a mask to filter out rows with invalid values (NaN or inf) in fluxes or fluxes_err
 valid_indices = ~np.isnan(fluxes) & ~np.isnan(fluxes_err) & ~np.isinf(fluxes) & ~np.isinf(fluxes_err)
@@ -113,7 +113,7 @@ plt.show()
 
 #fit only first part of the plot now
 # Define the range of the data to fit
-range=10
+range=18
 fit_bright_range = bin_centers < range
 fit_faint_range= bin_centers >= range
 
