@@ -10,6 +10,7 @@ import background_estimation
 from astropy.io import fits
 import bad_data_clean
 
+
 #gete data
 max_localbackground_radius=200
 fraction_bin=max_localbackground_radius*2
@@ -32,7 +33,7 @@ plt.show()
 
 #parameters for the background estimation
 fraction_bin_totalbackground=1.1 #num bins is data shape/fraction_bin
-sigmas_thershold = 3#how many sigmas of std after background is the threshold
+sigmas_thershold = 2#how many sigmas of std after background is the threshold
 #find background
 background_value,background_std=background_estimation.finding_background(data, fraction_bin_totalbackground, sigmas_thershold) #problem!!
 background_thershold=background_value+sigmas_thershold*background_std
@@ -62,7 +63,7 @@ plt.show()
 
 
 #use only part of the data
-size=260
+size=600
 data=data[0:size,0:size]
 
 #finding radius paramters
@@ -212,6 +213,7 @@ for i, center in enumerate(centers_list):
     # add the galaxy profile around its center
     data_with_star_positions += galaxy_profile
     
+
 # plot original image and created model image
 plt.figure(figsize=(10, 5))
 plt.subplot(1, 2, 1)
