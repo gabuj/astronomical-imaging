@@ -330,10 +330,10 @@ def finding_centers_radii(data, overexposed_threshold, background_level, backgro
     print(f"\nTotal number of galaxies detected: {galaxy_count}")
 
     # Optional: Display the image
-    plt.imshow(output_image, cmap='gray')
-    plt.colorbar()
-    plt.title('Detected Galaxies')
-    plt.show()
+    # plt.imshow(output_image, cmap='gray')
+    # plt.colorbar()
+    # plt.title('Detected Galaxies')
+    # plt.show()
     
     return centers_list, radii_list
 
