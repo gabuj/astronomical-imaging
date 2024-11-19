@@ -2,7 +2,7 @@ from scipy.optimize import curve_fit
 import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
-import creating_fake_image
+#import creating_fake_image
 import finding_center_radius
 import pandas as pd
 import  takeout_bleeding
