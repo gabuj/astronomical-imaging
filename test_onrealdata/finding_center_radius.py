@@ -329,11 +329,15 @@ def finding_centers_radii(data, overexposed_threshold, background_level, backgro
     # Print the total number of galaxies detected
     print(f"\nTotal number of galaxies detected: {galaxy_count}")
 
-    # Optional: Display the image
+    # # Optional: Display the image
     # plt.imshow(output_image, cmap='gray')
     # plt.colorbar()
     # plt.title('Detected Galaxies')
     # plt.show()
+    # #save output as fits file
+    hdu = fits.PrimaryHDU(output_image)
+    hdul = fits.HDUList([hdu])
+    hdul.writeto('example_detected_galaxies.fits', overwrite=True)
     
     return centers_list, radii_list
 
