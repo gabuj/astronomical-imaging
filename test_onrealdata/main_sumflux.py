@@ -33,11 +33,12 @@ plt.show()
 
 #parameters for the background estimation
 fraction_bin_totalbackground=1.1 #num bins is data shape/fraction_bin
-sigmas_thershold = 2#how many sigmas of std after background is the threshold
+sigmas_thershold = 0.5#how many sigmas of std after background is the threshold
+std_1pixel=5
 #find background
 background_value,background_std=background_estimation.finding_background(data, fraction_bin_totalbackground, sigmas_thershold) #problem!!
 background_thershold=background_value+sigmas_thershold*background_std
-
+bleeding_threshold=background_value+std_1pixel*background_std
 #close file
 hdulist.close()
 
@@ -45,7 +46,7 @@ hdulist.close()
 #bleeding centerss
 bleeding_centers= [(3217,1427), (2281,905),(2773,974),(3315,776),(5,1430)] #list of (y, x) coordinates of the centers of the bleeding regions
 #take away bleeing
-data=takeout_bleeding.takeou_bleeing(data,bleeding_centers,background_thershold,background_value)
+data=takeout_bleeding.takeou_bleeing(data,bleeding_centers,bleeding_threshold,background_value)
 
 #still have to do: take out bad data
 maxx=data.shape[1]
@@ -65,8 +66,8 @@ plt.show()
 #use only part of the data
 
 
-# size=1000
-# data=data[0:size,0:size]
+size=600
+data=data[0:size,0:size]
 
 #finding radius paramters
 overexposed_threshold=65535
