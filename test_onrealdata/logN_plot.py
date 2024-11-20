@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 #data is contained in cat file
-filename = "C:/SAOImageDS9/my_project_outputs/test_onrealdata/flux/size_800/galaxy_catalog.cat"
+filename = "C:/SAOImageDS9/my_project_outputs/test_onrealdata/flux/size_1500/galaxy_catalog.cat"
 fluxes, fluxes_err = np.loadtxt(filename, delimiter=' ', skiprows=1, usecols=(2,3), unpack=True)
 # Create a mask to filter out rows with invalid values (NaN or inf) in fluxes or fluxes_err
 valid_indices = ~np.isnan(fluxes) & ~np.isnan(fluxes_err) & ~np.isinf(fluxes) & ~np.isinf(fluxes_err)
@@ -26,6 +26,12 @@ zero_point_error = hdul[0].header['MAGZRR']
 hdul.close()
 
 
+faint_range=12
+end_range=15
+num_bins = int(galaxy_nuber/20)
+
+
+
 #convert from pixell to magnitude
 magnitude = -2.5 * np.log10(fluxes)
 magnitude_err = 2.5/np.log(10)*fluxes_err/fluxes
@@ -38,7 +44,6 @@ magnitude_errors = np.sqrt(magnitude_err*2 + zero_point_error*2)
 
 
 #count galaxies under certain magnitude
-num_bins = int(galaxy_nuber/10)
 counts, bin_edges = np.histogram(magnitudes, bins=num_bins)
 
 
@@ -113,9 +118,10 @@ plt.show()
 
 #fit only first part of the plot now
 # Define the range of the data to fit
-range=16
-fit_bright_range = bin_centers < range
-fit_faint_range= bin_centers >= range
+fit_bright_range = bin_centers < faint_range
+#faint range bin centers between 12 and 15
+fit_faint_range= bin_centers < end_range
+fit_faint_range= fit_faint_range & ~fit_bright_range   
 
 x_bright=bin_centers[fit_bright_range]
 y_bright=counts[fit_bright_range]

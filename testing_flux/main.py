@@ -5,8 +5,7 @@ import numpy as np
 import creating_fake_image
 import pandas as pd
 import background_estimation
-from astropy.io import fits
-import new_deblendingway
+import finding_center_radius
 #get data
 max_localbackground_radius=200
 fraction_bin=max_localbackground_radius*2
@@ -37,9 +36,10 @@ plt.show()
 #parameters for the background estimation
 fraction_bin_totalbackground=3 #num bins is data shape/fraction_bin
 sigmas_thershold = 5#how many sigmas of std after background is the threshold
+
 #find background
 #background_thershold=background_estimation.finding_background(data, fraction_bin_totalbackground, sigmas_thershold)
-background_level = 3415
+background_level = 3215
 noise_level = 5
 background_thershold= background_level + 5 * noise_level
 
@@ -71,7 +71,7 @@ cat_highintensity_file = "LAST_PUTTINGSTUFFTOGETHER/highestintensity_galaxies.ca
 
 
 
-centers_list,radii_list=new_deblendingway.finding_centers_radii(data, max_radius, overexposed_threshold,background_level,background_std)
+centers_list,radii_list=finding_center_radius.finding_centers_radii(data, overexposed_threshold,background_level,background_std,sigmas_thershold)
 print(f"centers are {centers_list}")
 
 # file_path="fj"

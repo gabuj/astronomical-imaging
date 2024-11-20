@@ -2,13 +2,9 @@ from scipy.optimize import curve_fit
 import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
-import creating_fake_image
 import finding_center_radius
 import pandas as pd
 import background_estimation
-from astropy.io import fits
-import bad_data_clean
-import new_deblendingway
 #get data
 max_localbackground_radius=200
 fraction_bin=max_localbackground_radius*2
@@ -72,7 +68,7 @@ cat_highintensity_file = "LAST_PUTTINGSTUFFTOGETHER/highestintensity_galaxies.ca
 
 
 
-centers_list,radii_list=new_deblendingway.finding_centers_radii(data, max_radius, overexposed_threshold,background_level,background_std)
+centers_list,radii_list=finding_center_radius.finding_centers_radii(data, max_radius, overexposed_threshold,background_level,background_std)
 print(f"centers are {centers_list}")
 x, y = np.indices(data.shape)
 
