@@ -33,7 +33,7 @@ plt.show()
 
 #parameters for the background estimation
 fraction_bin_totalbackground=1.1 #num bins is data shape/fraction_bin
-sigmas_thershold = 0.5#how many sigmas of std after background is the threshold
+sigmas_thershold = 0.6#how many sigmas of std after background is the threshold
 std_1pixel=5
 #find background
 background_value,background_std=background_estimation.finding_background(data, fraction_bin_totalbackground, sigmas_thershold) #problem!!
@@ -66,8 +66,9 @@ plt.show()
 #use only part of the data
 
 
-size=600
-data=data[0:size,0:size]
+size=500
+a=300
+data=data[a:size+a,a:size+a]
 
 #finding radius paramters
 overexposed_threshold=65535
