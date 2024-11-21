@@ -138,3 +138,10 @@ def finding_local_background(data, fraction_bin):
     thresh = x_max
 
     return thresh
+
+path='fits_file/mosaic.fits'
+hdulist = fits.open(path)
+
+data = hdulist[0].data
+print(np.mean(data.shape))
+finding_background(data, 0.3, 0)
