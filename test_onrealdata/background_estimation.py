@@ -58,11 +58,17 @@ def finding_background(data, fraction_bin, sigmas_thershold):
     half_max = max_value / 2
     # Find the left and right half max points
     indices = np.where(counts > half_max)[0]
-
-    std_guess = max_value / 60000  # fallback if FWHM cannot be determined
+    if indices.any():
+        left_base = bin_centers[indices[0]]
+        right_base = bin_centers[indices[-1]]
+        fwhm = right_base - left_base
+        std_guess = fwhm / 2.355  # Convert FWHM to std deviation
+    else:
+        std_guess = max_value / 60000  # fallback if FWHM cannot be determined
     m_guess = x_max
     p0 = [a_guess, std_guess, m_guess]
 
+    near_max = int(fwhm * 1.5 / (bin_edges[1] - bin_edges[0]))
 
     popt, pcov = curve_fit(gaussian, new_bin_centers, new_counts, p0=p0, maxfev=10000)
 
@@ -85,22 +91,19 @@ def finding_background(data, fraction_bin, sigmas_thershold):
 
 
     #set the threshold to 5 times the standard deviation of the gaussian meaning if the pixel intensity is greater than 5*std then it is a a
-    # thresh = sigmas_thershold*popt[1]+popt[2]
+    thresh = sigmas_thershold*popt[1]+popt[2]
     thersh_err =np.sqrt(np.diag(pcov)[1]*sigmas_thershold**2+np.diag(pcov)[2])
-    background_value = popt[2]
-    background_std = popt[1]
-    # print(f"Threshold: {thresh} +- {thersh_err}")
 
-    # rel_err = thersh_err/thresh
+    print(f"Threshold: {thresh} +- {thersh_err}")
 
-    # print(f"Relative error: {rel_err}")
-    print(f"background value: {background_value}, std is {background_std}")
-    
-    return background_value, background_std
+    rel_err = thersh_err/thresh
+
+    print(f"Relative error: {rel_err}")
+    return thresh
 
 
-def finding_local_background(data, fraction_bin):
-    num_bins = np.mean(data.shape)/fraction_bin
+def finding_local_background(data, fraction_bin, sigmas_thershold):
+    num_bins = int(np.mean(data.shape)/fraction_bin)
     #only analyse the part of data close to max value when fitting the gaussian
     if num_bins>20*fraction_bin:
         near_max = int(num_bins/fraction_bin)
@@ -111,10 +114,16 @@ def finding_local_background(data, fraction_bin):
     
     
     
-    num_bins = int(num_bins)
-
+    # num_bins = int(num_bins)
+    print(num_bins)
+    if num_bins <= 0:
+        raise ValueError(f"Invalid number of bins: {num_bins}. Check fraction_bin and data size.")
+    
     # Calculate histogram bin counts and bin edges
     counts, bin_edges = np.histogram(data.ravel(), bins=num_bins)
+    
+
+    print(num_bins)
 
     # Calculate bin centers as the midpoint between each bin edge
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
@@ -125,7 +134,7 @@ def finding_local_background(data, fraction_bin):
     # # plt.yscale('log')  # Log scale to better visualize differences in intensity
     # plt.xlabel('Pixel Intensity')
     # plt.ylabel('Frequency (Log Scale)')
-    # plt.title('local background histogram')
+    # plt.title('Histogram of Pixel Intensities')
     # plt.show()
 
     #find the maximum value
@@ -133,8 +142,13 @@ def finding_local_background(data, fraction_bin):
     max_index = np.where(counts == max_value) 
     max_index = max_index[0][0]
     x_max = bin_centers[max_index]
-    print(f"local background value: {max_value} at {x_max}")
+    print(f"local background value: {x_max}")
     #set the threshold to 5 times the standard deviation of the gaussian meaning if the pixel intensity is greater than 5*std then it is a star
     thresh = x_max
 
     return thresh
+
+# path= '/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/fake_files/1_extended_diffuses.fits'
+# hdulist = fits.open(path)
+# data = hdulist[0].data
+# finding_background(data, 0.3, 5)

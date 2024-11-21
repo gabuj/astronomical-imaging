@@ -19,7 +19,7 @@ def finding_centers_radii(data, overexposed_threshold, background_level, backgro
 
     # Radius relative to hole radius in respect to the first centre where to start
     min_rad = 0.5
-    minimum_radius = 4
+    minimum_radius = 2
     # Relative intensity of second centre
     relative_int = 0.01
 
@@ -161,7 +161,7 @@ def finding_centers_radii(data, overexposed_threshold, background_level, backgro
 
             # Check blending condition
             #If 70% is less than threshold and at least 1 value is more than threshold
-            if np.sum((radius_values < background_threshold))/(len(radius_values)) >= 0.7 and np.any(
+            if np.sum((radius_values < background_threshold))/(len(radius_values)) >= 0.9 and np.any(
                 radius_values > background_threshold + higher_thanbackground_blended_galaxy):
                 blending_detected = True
                 boundary_radius1 = i  # Mark the boundary for blending

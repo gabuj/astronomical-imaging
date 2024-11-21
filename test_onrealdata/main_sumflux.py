@@ -66,7 +66,7 @@ plt.show()
 #use only part of the data
 
 
-size=500
+size=600
 a=300
 data=data[a:size+a,a:size+a]
 
