@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 #data is contained in cat file
-filename = "C:/SAOImageDS9/my_project_outputs/test_onrealdata/flux/size_800/galaxy_catalog.cat"
+filename = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/test_onrealdata/galaxy_catalog.cat"
 fluxes, fluxes_err = np.loadtxt(filename, delimiter=' ', skiprows=1, usecols=(2,3), unpack=True)
 # Create a mask to filter out rows with invalid values (NaN or inf) in fluxes or fluxes_err
 valid_indices = ~np.isnan(fluxes) & ~np.isnan(fluxes_err) & ~np.isinf(fluxes) & ~np.isinf(fluxes_err)

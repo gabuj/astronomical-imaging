@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Produced with astropy.io.votable version 6.1.1
+<!-- Produced with astropy.io.votable version 5.3.4
      http://www.astropy.org/ -->
 <VOTABLE version="1.4" xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://www.ivoa.net/xml/VOTable/VOTable-1.4.xsd">
  <RESOURCE type="results">
@@ -11,64 +11,64 @@
    <DATA>
     <TABLEDATA>
      <TR>
-      <TD>140</TD>
-      <TD>394</TD>
-      <TD>4244.8806044280145</TD>
-      <TD>55.668732186037325</TD>
+      <TD>2135</TD>
+      <TD>3758</TD>
+      <TD>339397.9570744897</TD>
+      <TD>436.497112520706</TD>
      </TR>
      <TR>
-      <TD>397</TD>
-      <TD>208</TD>
-      <TD>2100.1230213280965</TD>
-      <TD>40.74999597966569</TD>
+      <TD>2089</TD>
+      <TD>1424</TD>
+      <TD>270782.7593392944</TD>
+      <TD>390.0415326139071</TD>
      </TR>
      <TR>
-      <TD>145</TD>
-      <TD>199</TD>
-      <TD>1521.8867332791367</TD>
-      <TD>39.43816898398551</TD>
+      <TD>558</TD>
+      <TD>4098</TD>
+      <TD>256866.91948154918</TD>
+      <TD>379.67678549045735</TD>
      </TR>
      <TR>
-      <TD>472</TD>
-      <TD>55</TD>
-      <TD>1318.4728450724058</TD>
-      <TD>35.018738903948865</TD>
+      <TD>2132</TD>
+      <TD>2312</TD>
+      <TD>255117.10584241402</TD>
+      <TD>378.10883799409186</TD>
      </TR>
      <TR>
-      <TD>202</TD>
-      <TD>105</TD>
-      <TD>1289.4444107015217</TD>
-      <TD>35.663897172082095</TD>
+      <TD>65</TD>
+      <TD>662</TD>
+      <TD>197474.23003327847</TD>
+      <TD>335.1126648854623</TD>
      </TR>
      <TR>
-      <TD>107</TD>
-      <TD>256</TD>
-      <TD>1252.4197076531773</TD>
-      <TD>32.17599880832752</TD>
+      <TD>2466</TD>
+      <TD>3410</TD>
+      <TD>173984.52286754976</TD>
+      <TD>312.6806347870955</TD>
      </TR>
      <TR>
-      <TD>351</TD>
-      <TD>424</TD>
-      <TD>1111.9108017377546</TD>
-      <TD>30.436330240294794</TD>
+      <TD>446</TD>
+      <TD>2300</TD>
+      <TD>154908.53018266513</TD>
+      <TD>294.98658388032135</TD>
      </TR>
      <TR>
-      <TD>313</TD>
-      <TD>382</TD>
-      <TD>1082.702236697498</TD>
-      <TD>32.626127652123905</TD>
+      <TD>1772</TD>
+      <TD>578</TD>
+      <TD>151285.1828753102</TD>
+      <TD>291.28987788012694</TD>
      </TR>
      <TR>
-      <TD>352</TD>
-      <TD>7</TD>
-      <TD>1032.0049481520996</TD>
-      <TD>33.598982690883325</TD>
+      <TD>1692</TD>
+      <TD>30</TD>
+      <TD>150586.92538182778</TD>
+      <TD>290.9416733829858</TD>
      </TR>
      <TR>
-      <TD>47</TD>
-      <TD>128</TD>
-      <TD>932.3522743367032</TD>
-      <TD>29.28275360313847</TD>
+      <TD>634</TD>
+      <TD>1495</TD>
+      <TD>148946.06668046783</TD>
+      <TD>289.4241409091519</TD>
      </TR>
     </TABLEDATA>
    </DATA>

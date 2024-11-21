@@ -66,9 +66,9 @@ plt.show()
 #use only part of the data
 
 
-size=500
-a=300
-data=data[a:size+a,a:size+a]
+# size=500
+# a=300
+# data=data[a:size+a,a:size+a]
 
 #finding radius paramters
 overexposed_threshold=65535

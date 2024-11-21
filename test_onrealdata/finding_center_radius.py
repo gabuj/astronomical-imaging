@@ -161,7 +161,7 @@ def finding_centers_radii(data, overexposed_threshold, background_level, backgro
 
             # Check blending condition
             #If 70% is less than threshold and at least 1 value is more than threshold
-            if np.sum((radius_values < background_threshold))/(len(radius_values)) >= 0.7 and np.any(
+            if np.sum((radius_values < background_threshold))/(len(radius_values)) >= 0.9 and np.any(
                 radius_values > background_threshold + higher_thanbackground_blended_galaxy):
                 blending_detected = True
                 boundary_radius1 = i  # Mark the boundary for blending
@@ -247,7 +247,7 @@ def finding_centers_radii(data, overexposed_threshold, background_level, backgro
                         radius_values2 = image_data[(radii2 == current_radius2) & ~processed_pixels]  # Exclude already processed pixels
 
                         # Check blending condition for second galaxy
-                        if np.sum((radius_values2 < background_threshold))/(len(radius_values2)) >= 0.3:
+                        if np.sum((radius_values2 < background_threshold))/(len(radius_values2)) >= 0.7:
                             threshold_radius2 = current_radius2  # Mark the boundary for blending
                             print(f"Blending detected for Galaxy {galaxy_count} at radius {threshold_radius2}")
                             break

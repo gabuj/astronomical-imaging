@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Produced with astropy.io.votable version 5.3.4
+     http://www.astropy.org/ -->
+<VOTABLE version="1.4" xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://www.ivoa.net/xml/VOTable/VOTable-1.4.xsd">
+ <RESOURCE type="results">
+  <TABLE>
+   <FIELD ID="x" datatype="long" name="x"/>
+   <FIELD ID="y" datatype="long" name="y"/>
+   <FIELD ID="intensity" datatype="double" name="intensity"/>
+   <FIELD ID="intensity_error" datatype="double" name="intensity error"/>
+   <DATA>
+    <TABLEDATA>
+     <TR>
+      <TD>2135</TD>
+      <TD>3758</TD>
+      <TD>339397.9570744897</TD>
+      <TD>436.497112520706</TD>
+     </TR>
+     <TR>
+      <TD>2089</TD>
+      <TD>1424</TD>
+      <TD>270782.7593392944</TD>
+      <TD>390.0415326139071</TD>
+     </TR>
+     <TR>
+      <TD>558</TD>
+      <TD>4098</TD>
+      <TD>256866.91948154918</TD>
+      <TD>379.67678549045735</TD>
+     </TR>
+     <TR>
+      <TD>2132</TD>
+      <TD>2312</TD>
+      <TD>255117.10584241402</TD>
+      <TD>378.10883799409186</TD>
+     </TR>
+     <TR>
+      <TD>65</TD>
+      <TD>662</TD>
+      <TD>197474.23003327847</TD>
+      <TD>335.1126648854623</TD>
+     </TR>
+     <TR>
+      <TD>2466</TD>
+      <TD>3410</TD>
+      <TD>173984.52286754976</TD>
+      <TD>312.6806347870955</TD>
+     </TR>
+     <TR>
+      <TD>446</TD>
+      <TD>2300</TD>
+      <TD>154908.53018266513</TD>
+      <TD>294.98658388032135</TD>
+     </TR>
+     <TR>
+      <TD>1772</TD>
+      <TD>578</TD>
+      <TD>151285.1828753102</TD>
+      <TD>291.28987788012694</TD>
+     </TR>
+     <TR>
+      <TD>1692</TD>
+      <TD>30</TD>
+      <TD>150586.92538182778</TD>
+      <TD>290.9416733829858</TD>
+     </TR>
+     <TR>
+      <TD>634</TD>
+      <TD>1495</TD>
+      <TD>148946.06668046783</TD>
+      <TD>289.4241409091519</TD>
+     </TR>
+    </TABLEDATA>
+   </DATA>
+  </TABLE>
+ </RESOURCE>
+</VOTABLE>
