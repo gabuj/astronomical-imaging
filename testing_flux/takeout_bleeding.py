@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.ndimage import label
-
-def takeou_bleeing(data,bleeding_centers,threshold):
+import matplotlib.pyplot as plt
+def takeou_bleeing(data,bleeding_centers,threshold,background_value):
     #get rid of bleeding regions
     #define bleeding region
 
@@ -14,6 +14,9 @@ def takeou_bleeing(data,bleeding_centers,threshold):
 
     #create labels and take aaway all pixels that are true in the binary mask that are part of the same label
     labels, num_labels = label(binary_mask)
+ 
+    
+    print(f"Number of labels: {num_labels}")
     for centers in bleeding_centers:
         #find label they belong to
         y, x = centers
@@ -25,7 +28,13 @@ def takeou_bleeing(data,bleeding_centers,threshold):
 
 
     galaxy_mask=np.copy(data)
-    galaxy_mask[bleeding_region==True]=0
+    galaxy_mask[bleeding_region==True]=background_value
+    
+    #show galaxy mask
+    plt.imshow(bleeding_region, cmap='gray', origin='lower')
+    plt.colorbar()
+    plt.title('bleeding_region')
+    plt.show()
     return galaxy_mask
 
     #galaxy_mask is data without the bleeding regions

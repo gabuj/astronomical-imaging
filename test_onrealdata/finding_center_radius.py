@@ -19,7 +19,7 @@ def finding_centers_radii(data, overexposed_threshold, background_level, backgro
 
     # Radius relative to hole radius in respect to the first centre where to start
     min_rad = 0.5
-    minimum_radius = 4
+    minimum_radius = 2
     # Relative intensity of second centre
     relative_int = 0.01
 

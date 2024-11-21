@@ -2,13 +2,27 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 #data is contained in cat file
+<<<<<<< HEAD
 filename = "/Users/yuri/Desktop/Year 3 Lab/Astronomical Image Processing/Git repository/astronomical-imaging/test_onrealdata/galaxy_catalog.cat"
+=======
+filename = "C:/SAOImageDS9/my_project_outputs/test_onrealdata/flux/size_full/galaxy_catalog.cat"
+>>>>>>> 58ca902c786742e31731509f5be2da3cd3700d41
 fluxes, fluxes_err = np.loadtxt(filename, delimiter=' ', skiprows=1, usecols=(2,3), unpack=True)
 # Create a mask to filter out rows with invalid values (NaN or inf) in fluxes or fluxes_err
 valid_indices = ~np.isnan(fluxes) & ~np.isnan(fluxes_err) & ~np.isinf(fluxes) & ~np.isinf(fluxes_err)
 # Apply the mask to both fluxes and fluxes_err
 fluxes = fluxes[valid_indices]
 fluxes_err = fluxes_err[valid_indices]
+
+
+#take out nan values from fluxes and fluxes_err and negative values
+indexes = np.where(fluxes > 0)
+fluxes = fluxes[indexes]
+fluxes_err = fluxes_err[indexes]
+
+
+
+
 galaxy_nuber=len(fluxes)
 print(f"number of galaxies: {galaxy_nuber}")
 
@@ -26,11 +40,9 @@ zero_point_error = hdul[0].header['MAGZRR']
 hdul.close()
 
 
-faint_range=12
-end_range=15
-num_bins = int(galaxy_nuber/20)
-
-
+faint_range=16
+end_range=19
+num_bins = int(galaxy_nuber/2)
 
 #convert from pixell to magnitude
 magnitude = -2.5 * np.log10(fluxes)
@@ -86,7 +98,7 @@ bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
 # Plot histogram of pixel intensities
 plt.figure(figsize=(10, 6))
-plt.errorbar(bin_centers, counts, xerr=bin_flux_errors, yerr=yerror, fmt='o', color='black', ls='-',alpha=0.8)
+plt.errorbar(bin_centers, counts, xerr=bin_flux_errors, yerr=yerror, fmt='o', color='black', ls='-',alpha=0.8,label='Data')
 plt.yscale('log')  # Log scale to better visualize differences in intensity
 plt.xlabel('Pixel Intensity')
 plt.ylabel('Frequency (Log Scale)')
@@ -106,7 +118,7 @@ print(f"c: {c} +/- {c_err}")
 
 # Plot the data and the fit
 plt.figure(figsize=(10, 6))
-plt.errorbar(bin_centers, counts, xerr=bin_flux_errors, yerr=yerror, fmt='o', color='black', ls='-',alpha=0.8)
+plt.errorbar(bin_centers, counts, xerr=bin_flux_errors, yerr=yerror, fmt='o', color='black', ls='-',alpha=0.8,label='Data')
 plt.plot(bin_centers, 10**(m * bin_centers + c), color='red', label=f'Fit: y = {m:.2f}x + {c:.2f}')
 plt.yscale('log')
 plt.xlabel('Pixel Intensity')
@@ -149,7 +161,7 @@ print(f"c_faint: {c_faint} +/- {c_err_faint}")
 
 # Plot the data and the fits
 plt.figure(figsize=(10, 6))
-plt.errorbar(bin_centers, counts, xerr=bin_flux_errors, yerr=yerror, fmt='o', color='black', ls='-',alpha=0.8)
+plt.errorbar(bin_centers, counts, xerr=bin_flux_errors, yerr=yerror, fmt='o', color='black', ls='-',alpha=0.8,label='Data')
 plt.plot(x_bright, 10**(m_bright * x_bright + c_bright), color='red', label=f'Bright Fit: y = {m_bright:.2f}x + {c_bright:.2f}')
 plt.plot(x_faint, 10**(m_faint * x_faint + c_faint), color='blue', label=f'Faint Fit: y = {m_faint:.2f}x + {c_faint:.2f}')
 plt.yscale('log')
